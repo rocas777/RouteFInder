@@ -9,4 +9,5 @@ func main() {
 	g := graph.Graph{}
 	g.Init()
 	println(len(connectivity.TarjanGetStronglyConnectedComponents(&g)))
+	println(g.GetCoordsBox())
 }
