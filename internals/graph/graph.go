@@ -6,6 +6,9 @@ type Graph struct {
 
 func (g *Graph) Init() {
 	g.initBus()
+	println(len(g.Nodes))
+	g.initMetro()
+	println(len(g.Nodes))
 }
 
 func (g *Graph) AddNode(node *Node) {

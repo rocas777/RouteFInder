@@ -8,5 +8,13 @@ import (
 func main() {
 	g := graph.Graph{}
 	g.Init()
-	println(len(connectivity.TarjanGetStronglyConnectedComponents(&g)))
+	components := connectivity.TarjanGetStronglyConnectedComponents(&g)
+	for _, component := range components {
+		for _, node := range component {
+			println(node.Code)
+		}
+		println()
+		println()
+		println()
+	}
 }
