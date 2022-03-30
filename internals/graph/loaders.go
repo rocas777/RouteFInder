@@ -31,7 +31,7 @@ func (g *Graph) initBus() {
 		panic(err)
 	}
 
-	//pass temp structure data to final node
+	//pass temp structure data To final node
 	//create map for faster initialization
 	for _, tempNode := range tempNodes {
 		node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, tempNode.Code)
@@ -39,7 +39,7 @@ func (g *Graph) initBus() {
 		helperMap[tempNode.Code] = node
 	}
 
-	//read files from lines directory
+	//read files From lines directory
 	files, err := ioutil.ReadDir("data/bus/lines")
 	if err != nil {
 		log.Fatal(err)
@@ -69,14 +69,15 @@ func (g *Graph) initBus() {
 			}
 
 			lastNode = nil
-			//setup edges
+			//setup Edges
 			for i, line := range csvLines {
 				if i == 0 {
 					totalTime = float64(utils.StringToInt(line[0]))
 				} else {
 					currentNode := helperMap[line[0]]
 					if lastNode != nil {
-						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude)) //todo update weight
+						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
+						//currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
 					}
 					lastNode = currentNode
 				}
