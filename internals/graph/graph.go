@@ -1,7 +1,7 @@
 package graph
 
 type Graph struct {
-	nodes []*Node
+	Nodes []*Node
 }
 
 func (g *Graph) Init() {
@@ -9,7 +9,11 @@ func (g *Graph) Init() {
 }
 
 func (g *Graph) AddNode(node *Node) {
-	g.nodes = append(g.nodes, node)
+	g.Nodes = append(g.Nodes, node)
 }
+
+/*func (g *Graph) GetNode(code string) *Node {
+	return g.Nodes[code]
+}*/
 
 func (g Graph) Draw() {}
