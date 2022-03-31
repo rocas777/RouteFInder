@@ -23,7 +23,14 @@ func (g *Graph) AddNode(node *Node) {
 	g.Nodes = append(g.Nodes, node)
 }
 
-// returns maxLat, minLat, maxLon, minLon
+func (g *Graph) GetEdges() []*Edge {
+	var outEdges []*Edge
+	for _, node := range g.Nodes {
+		outEdges = append(outEdges, node.Edges...)
+	}
+	return outEdges
+}
+
 func (g *Graph) GetCoordsBox() (float64, float64, float64, float64) {
 	if g.maxLat == g.maxLon && g.minLat == g.minLon && g.minLat == 0 {
 		g.maxLat = -10000
@@ -47,9 +54,3 @@ func (g *Graph) GetCoordsBox() (float64, float64, float64, float64) {
 	}
 	return g.maxLat, g.minLat, g.maxLon, g.minLon
 }
-
-/*func (g *Graph) GetNode(code string) *Node {
-	return g.Nodes[code]
-}*/
-
-func (g Graph) Draw() {}

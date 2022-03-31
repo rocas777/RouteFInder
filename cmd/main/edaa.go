@@ -10,4 +10,5 @@ func main() {
 	g.Init()
 	println(len(connectivity.TarjanGetStronglyConnectedComponents(&g)))
 	println(g.GetCoordsBox())
+
 }

@@ -78,8 +78,7 @@ func main() {
 		tag := n.Tags.Find(filter)
 		if tag != "" {
 			newNodes = append(newNodes, n)
-		}
-		if _, ok := nodesInWay[n.ID]; ok {
+		} else if _, ok := nodesInWay[n.ID]; ok {
 			newNodes = append(newNodes, n)
 		}
 	}

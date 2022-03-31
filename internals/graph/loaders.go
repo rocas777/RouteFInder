@@ -110,10 +110,10 @@ func (g *Graph) initBus() {
 
 func (g *Graph) initMetro() {
 	helperMap := loadMetroStops(g)
-	loadMetroEdges(g, helperMap)
+	loadMetroEdges(helperMap)
 }
 
-func loadMetroEdges(g *Graph, helperMap map[string]*Node) {
+func loadMetroEdges(helperMap map[string]*Node) {
 	lines := make(map[string][]*tempStopTimeStruct)
 	in, err := os.Open("data/metro/stop_times.txt")
 	if err != nil {
