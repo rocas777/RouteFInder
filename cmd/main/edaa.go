@@ -11,4 +11,7 @@ func main() {
 	println(len(connectivity.TarjanGetStronglyConnectedComponents(&g)))
 	println(g.GetCoordsBox())
 
+	g.ExportNodes("exports/nodes.csv")
+	g.ExportEdges("exports/edges.csv")
+
 }
