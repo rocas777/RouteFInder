@@ -130,11 +130,11 @@ func loadMetroEdges(helperMap map[string]*Node) {
 		panic(err)
 	}
 	for _, stopTime := range tempStopTimes {
-		if _, ok := lines[stopTime.StopId]; ok {
-			lines[stopTime.StopId] = append(lines[stopTime.StopId], stopTime)
+		if _, ok := lines[stopTime.TripId]; ok {
+			lines[stopTime.TripId] = append(lines[stopTime.TripId], stopTime)
 		} else {
-			lines[stopTime.StopId] = make([]*tempStopTimeStruct, 1)
-			lines[stopTime.StopId][0] = stopTime
+			lines[stopTime.TripId] = make([]*tempStopTimeStruct, 1)
+			lines[stopTime.TripId][0] = stopTime
 		}
 	}
 
@@ -147,9 +147,10 @@ func loadMetroEdges(helperMap map[string]*Node) {
 			currentNode := helperMap[stopTime.StopId]
 			currentStopTime := stopTime
 			if lastNode != nil && lastStopTime != nil {
-				lastTime, _ := time.ParseDuration(lastStopTime.DepartureTime)
-				currentTime, _ := time.ParseDuration(currentStopTime.DepartureTime)
-				seconds := currentTime - lastTime
+				lastTime, _ := time.Parse("15:04:05", lastStopTime.DepartureTime)
+				currentTime, _ := time.Parse("15:04:05", currentStopTime.DepartureTime)
+
+				seconds := currentTime.Sub(lastTime)
 				lastNode.AddDestination(currentNode, seconds.Seconds())
 			}
 			lastNode = currentNode

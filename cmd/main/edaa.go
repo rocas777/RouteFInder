@@ -13,5 +13,4 @@ func main() {
 
 	g.ExportNodes("exports/nodes.csv")
 	g.ExportEdges("exports/edges.csv")
-
 }
