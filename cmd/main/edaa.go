@@ -16,6 +16,15 @@ func main() {
 	g.Init()
 	cleanGraph(&g)
 
+	start := time.Now()
+	g.ConnectGraphs()
+	elapsed := time.Since(start)
+	utils.PrintMemUsage()
+	fmt.Printf("Connecting graphs %s\n", elapsed)
+
+	disconnectedComponents, number := connectivity.TarjanGetStronglyConnectedComponents(&g)
+	printStronglyConnectedComponentsSizes(number, disconnectedComponents)
+
 	g.ExportNodes("exports/nodes.csv")
 	g.ExportEdges("exports/edges.csv")
 }
@@ -57,6 +66,9 @@ func printStronglyConnectedComponentsSizes(number int64, disconnectedComponents 
 	for _, components := range disconnectedComponents {
 		for _, component := range components {
 			componentSizes = append(componentSizes, len(component.Nodes))
+			if len(component.Nodes) == 1 {
+				println(component.Nodes[0].Code)
+			}
 		}
 	}
 	sort.Ints(componentSizes)

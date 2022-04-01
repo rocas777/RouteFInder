@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"edaa/internals/utils"
 	"fmt"
 	"regexp/syntax"
 	"time"
@@ -20,6 +21,9 @@ type Graph struct {
 
 func (g *Graph) Init() {
 	g.NodesMap = make(map[string]*Node)
+	g.WalkableNodes = make(map[string]*Node)
+	g.BusableNodes = make(map[string]*Node)
+	g.MetroableNodes = make(map[string]*Node)
 	start := time.Now()
 
 	g.initBus()
@@ -128,7 +132,7 @@ func (g *Graph) RemoveUnconnectedNodes(disconnectedComponents [][]*SCC) {
 	nodesToBeRemoved := make([]*Node, 0)
 	for _, components := range disconnectedComponents {
 		for _, component := range components {
-			if len(component.Nodes) < biggestScc && !component.HasStation || len(component.Nodes) <= 1 {
+			if len(component.Nodes) < biggestScc && !component.HasStation {
 				nodesToBeRemoved = append(nodesToBeRemoved, component.Nodes...)
 			}
 		}
@@ -156,4 +160,43 @@ func (g *Graph) RemoveNode(node *Node) {
 		}
 	}
 	delete(g.NodesMap, node.Code)
+}
+
+func (g *Graph) GetClosestNode(node *Node) (*Node, float64) {
+	closestDistance := 1000000000000000000000.0
+	var closestNode *Node
+	for _, wn := range g.WalkableNodes {
+		dist := utils.GetDistance(node.latitude, node.longitude, wn.latitude, wn.longitude)
+		if dist < closestDistance {
+			closestDistance = dist
+			closestNode = wn
+		}
+	}
+	return closestNode, closestDistance
+}
+
+func (g *Graph) ConnectGraphs() {
+	println(len(g.WalkableNodes))
+
+	println(len(g.MetroableNodes))
+	for _, node := range g.MetroableNodes {
+		closestNode, closestDistance := g.GetClosestNode(node)
+
+		// todo change walking speed
+		// m/s
+		const walkingSpeed = 4.0
+		node.AddDestination(closestNode, closestDistance/walkingSpeed)
+		closestNode.AddDestination(node, closestDistance/walkingSpeed)
+	}
+
+	println(len(g.BusableNodes))
+	for _, node := range g.BusableNodes {
+		closestNode, closestDistance := g.GetClosestNode(node)
+
+		// todo change walking speed
+		// m/s
+		const walkingSpeed = 4.0
+		node.AddDestination(closestNode, closestDistance/walkingSpeed)
+		closestNode.AddDestination(node, closestDistance/walkingSpeed)
+	}
 }

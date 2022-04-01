@@ -245,9 +245,10 @@ func (g *Graph) initRoads() {
 			}
 		}
 		if isStation {
-			helperMap[node.ID] = NewStationNode(node.Lat, node.Lon, "", "", node.ID)
+			//helperMap[node.ID] = NewStationNode(node.Lat, node.Lon, "", "", node.ID)
+			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
 		} else {
-			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", node.ID)
+			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
 		}
 	}
 
