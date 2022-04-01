@@ -27,8 +27,10 @@ func main() {
 	var station *graph.Node
 	for _, n := range g.BusableNodes {
 		station = n
+		break
 	}
 	startK = time.Now()
+
 	closest, _ := tree.GetClosest(station)
 	println("Node, CLosest:", station.Latitude, station.Longitude, closest.Lat(), closest.Lon(), utils.GetDistance(station.Latitude, station.Longitude, closest.Lat(), closest.Lon()))
 	elapsedK = time.Since(startK)
@@ -43,6 +45,12 @@ func main() {
 	disconnectedComponents, number := connectivity.TarjanGetStronglyConnectedComponents(&g)
 	printStronglyConnectedComponentsSizes(number, disconnectedComponents)
 
+	asd := g.NodesMap["bus_CMPO4"]
+	fmt.Printf("%v\n", asd)
+	fmt.Printf("%v\n%v\n", g.NodesMap["bus_CMPO4"].IncomingEdges[0].From, g.NodesMap["bus_CMPO4"].Edges[0].To)
+	fmt.Printf("%v\n%v\n", g.NodesMap["bus_CMPO4"].IncomingEdges[0].From.Code, g.NodesMap["bus_CMPO4"].Edges[0].To.Code)
+
+	g.ExportOsm("exports/graph.osm")
 	g.ExportNodes("exports/nodes.csv")
 	g.ExportEdges("exports/edges.csv")
 }

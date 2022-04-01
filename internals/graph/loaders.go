@@ -66,7 +66,6 @@ type OsmND struct {
 }
 
 func (g *Graph) initBus() {
-
 	// load csv data into temp struct
 	helperMap := make(map[string]*Node)
 	in, err := os.Open("data/bus/stops.csv")
@@ -103,6 +102,7 @@ func (g *Graph) initBus() {
 	for _, file := range files {
 		if !file.IsDir() {
 			csvFile, err := os.Open("data/bus/lines/" + file.Name())
+
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -113,8 +113,8 @@ func (g *Graph) initBus() {
 
 			// calculate line distance
 			for i, line := range csvLines {
+				currentNode := helperMap[line[0]]
 				if i != 0 {
-					currentNode := helperMap[line[0]]
 					if lastNode != nil {
 						totalDistance += utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude)
 					}
@@ -126,9 +126,10 @@ func (g *Graph) initBus() {
 			// setup Edges
 			for i, line := range csvLines {
 				if i == 0 {
-					totalTime = float64(utils.StringToInt(line[0])) * 3600
+					totalTime = float64(utils.StringToInt(line[0])) * 60
 				} else {
 					currentNode := helperMap[line[0]]
+
 					if lastNode != nil {
 						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
 						// currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
@@ -136,7 +137,6 @@ func (g *Graph) initBus() {
 					lastNode = currentNode
 				}
 			}
-			csvFile.Close()
 		}
 	}
 }
@@ -262,15 +262,16 @@ func (g *Graph) initRoads() {
 		}
 		var lastNode *Node
 		for _, node := range way.Nodes {
+			currentNode := helperMap[node.Ref]
 			if lastNode == nil {
-				lastNode = helperMap[node.Ref]
+				lastNode = currentNode
 			} else {
-				currentNode := helperMap[node.Ref]
 				dist := utils.GetDistance(lastNode.Latitude, lastNode.Longitude, currentNode.Latitude, currentNode.Longitude)
 				lastNode.AddDestination(currentNode, dist)
 				if isTwoWay {
 					currentNode.AddDestination(lastNode, dist)
 				}
+				lastNode = currentNode
 			}
 		}
 	}

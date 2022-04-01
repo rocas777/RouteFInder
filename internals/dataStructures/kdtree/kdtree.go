@@ -143,7 +143,7 @@ func (kd *KDTree) parallelSearch(node *Node, target interfaces.Node, depth int) 
 		if depth <= 3 {
 			leftChan <- kd.parallelSearch(node.LeftNode, target, depth+1)
 		} else {
-			leftChan <- kd.search(node.LeftNode, target)
+			leftChan <- kd.search(node.LeftNode, target, depth+1)
 		}
 	}()
 
@@ -151,7 +151,7 @@ func (kd *KDTree) parallelSearch(node *Node, target interfaces.Node, depth int) 
 		if depth <= 3 {
 			rightChan <- kd.parallelSearch(node.RightNode, target, depth+1)
 		} else {
-			rightChan <- kd.search(node.RightNode, target)
+			rightChan <- kd.search(node.RightNode, target, depth+1)
 		}
 	}()
 	currentEstimation := &BestEstimation{
@@ -173,7 +173,7 @@ func (kd *KDTree) parallelSearch(node *Node, target interfaces.Node, depth int) 
 	return currentEstimation
 }
 
-func (kd *KDTree) search(node *Node, target interfaces.Node) *BestEstimation {
+func (kd *KDTree) search(node *Node, target interfaces.Node, depth int) *BestEstimation {
 	if node == nil {
 		return &BestEstimation{
 			x:          10000000,
@@ -182,20 +182,45 @@ func (kd *KDTree) search(node *Node, target interfaces.Node) *BestEstimation {
 			n:          nil,
 		}
 	}
-	left := kd.search(node.LeftNode, target)
-	right := kd.search(node.RightNode, target)
 	currentEstimation := &BestEstimation{
 		x:          node.CurrentNode.Latitude,
 		y:          node.CurrentNode.Longitude,
 		estimation: 0,
 		n:          node.CurrentNode,
 	}
+	currentEstimation.dist(target)
 
-	if left.dist(target) < currentEstimation.dist(target) {
-		currentEstimation = left
-	}
-	if right.dist(target) < currentEstimation.dist(target) {
-		currentEstimation = right
+	axis := depth % k
+	if axis == 0 {
+		left := kd.search(node.LeftNode, target, depth+1)
+		left.dist(target)
+
+		if left.estimation < currentEstimation.estimation {
+			currentEstimation = left
+		}
+		if math.Abs(currentEstimation.x-left.x) < currentEstimation.estimation {
+			right := kd.search(node.RightNode, target, depth+1)
+			right.dist(target)
+
+			if right.estimation < currentEstimation.estimation {
+				currentEstimation = right
+			}
+		}
+	} else {
+		right := kd.search(node.RightNode, target, depth+1)
+		right.dist(target)
+
+		if right.estimation < currentEstimation.estimation {
+			currentEstimation = right
+		}
+		if math.Abs(currentEstimation.y-right.y) < currentEstimation.estimation {
+			left := kd.search(node.LeftNode, target, depth+1)
+			left.dist(target)
+
+			if left.estimation < currentEstimation.estimation {
+				currentEstimation = left
+			}
+		}
 	}
 
 	return currentEstimation
