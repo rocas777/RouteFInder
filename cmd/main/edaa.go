@@ -2,6 +2,7 @@ package main
 
 import (
 	"edaa/internals/algorithms/connectivity"
+	"edaa/internals/dataStructures/kdtree"
 	"edaa/internals/graph"
 	"edaa/internals/utils"
 	"fmt"
@@ -16,8 +17,25 @@ func main() {
 	g.Init()
 	cleanGraph(&g)
 
+	startK := time.Now()
+	//for i := 0; i < 10; i++ {
+	tree := kdtree.NewKDTree(&g)
+	//}
+	elapsedK := time.Since(startK)
+	fmt.Printf("KD tree %s\n", elapsedK)
+
+	var station *graph.Node
+	for _, n := range g.BusableNodes {
+		station = n
+	}
+	startK = time.Now()
+	closest, _ := tree.GetClosest(station)
+	println("Node, CLosest:", station.Latitude, station.Longitude, closest.Lat(), closest.Lon(), utils.GetDistance(station.Latitude, station.Longitude, closest.Lat(), closest.Lon()))
+	elapsedK = time.Since(startK)
+	fmt.Printf("KD tree search %s\n", elapsedK)
+
 	start := time.Now()
-	g.ConnectGraphs()
+	g.ConnectGraphs(tree)
 	elapsed := time.Since(start)
 	utils.PrintMemUsage()
 	fmt.Printf("Connecting graphs %s\n", elapsed)

@@ -3,8 +3,8 @@ package graph
 type Node struct {
 	Edges         []*Edge
 	IncomingEdges []*Edge
-	latitude      float64
-	longitude     float64
+	Latitude      float64
+	Longitude     float64
 	name          string
 	zone          string
 	Code          string
@@ -12,12 +12,20 @@ type Node struct {
 	IsStation     bool
 }
 
+func (n *Node) Lat() float64 {
+	return n.Latitude
+}
+
+func (n *Node) Lon() float64 {
+	return n.Longitude
+}
+
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
-	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, Code: code, IsStation: true, Referenced: false}
+	return &Node{Latitude: latitude, Longitude: longitude, name: name, zone: zone, Code: code, IsStation: true, Referenced: false}
 }
 
 func NewNormalNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
-	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, Code: code, IsStation: false}
+	return &Node{Latitude: latitude, Longitude: longitude, name: name, zone: zone, Code: code, IsStation: false}
 }
 
 func (n *Node) AddDestination(destination *Node, weight float64) {

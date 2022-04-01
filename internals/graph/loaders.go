@@ -116,7 +116,7 @@ func (g *Graph) initBus() {
 				if i != 0 {
 					currentNode := helperMap[line[0]]
 					if lastNode != nil {
-						totalDistance += utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude)
+						totalDistance += utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude)
 					}
 					lastNode = currentNode
 				}
@@ -130,8 +130,8 @@ func (g *Graph) initBus() {
 				} else {
 					currentNode := helperMap[line[0]]
 					if lastNode != nil {
-						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
-						// currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
+						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
+						// currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
 					}
 					lastNode = currentNode
 				}
@@ -266,7 +266,7 @@ func (g *Graph) initRoads() {
 				lastNode = helperMap[node.Ref]
 			} else {
 				currentNode := helperMap[node.Ref]
-				dist := utils.GetDistance(lastNode.latitude, lastNode.longitude, currentNode.latitude, currentNode.longitude)
+				dist := utils.GetDistance(lastNode.Latitude, lastNode.Longitude, currentNode.Latitude, currentNode.Longitude)
 				lastNode.AddDestination(currentNode, dist)
 				if isTwoWay {
 					currentNode.AddDestination(lastNode, dist)
