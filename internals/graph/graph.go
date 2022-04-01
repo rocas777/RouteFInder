@@ -1,6 +1,8 @@
 package graph
 
 import (
+	"edaa/internals/interfaces"
+	"edaa/internals/utils"
 	"fmt"
 	"regexp/syntax"
 	"time"
@@ -20,6 +22,9 @@ type Graph struct {
 
 func (g *Graph) Init() {
 	g.NodesMap = make(map[string]*Node)
+	g.WalkableNodes = make(map[string]*Node)
+	g.BusableNodes = make(map[string]*Node)
+	g.MetroableNodes = make(map[string]*Node)
 	start := time.Now()
 
 	g.initBus()
@@ -99,16 +104,16 @@ func (g *Graph) GetCoordsBox() (float64, float64, float64, float64) {
 		g.minLon = 10000
 
 		for _, node := range g.Nodes {
-			if node.latitude >= g.maxLat {
-				g.maxLat = node.latitude
-			} else if node.latitude <= g.minLat {
-				g.minLat = node.latitude
+			if node.Latitude >= g.maxLat {
+				g.maxLat = node.Latitude
+			} else if node.Latitude <= g.minLat {
+				g.minLat = node.Latitude
 			}
 
-			if node.longitude >= g.maxLon {
-				g.maxLon = node.longitude
-			} else if node.longitude <= g.minLon {
-				g.minLon = node.longitude
+			if node.Longitude >= g.maxLon {
+				g.maxLon = node.Longitude
+			} else if node.Longitude <= g.minLon {
+				g.minLon = node.Longitude
 			}
 		}
 	}
@@ -128,7 +133,7 @@ func (g *Graph) RemoveUnconnectedNodes(disconnectedComponents [][]*SCC) {
 	nodesToBeRemoved := make([]*Node, 0)
 	for _, components := range disconnectedComponents {
 		for _, component := range components {
-			if len(component.Nodes) < biggestScc && !component.HasStation || len(component.Nodes) <= 1 {
+			if len(component.Nodes) < biggestScc && !component.HasStation {
 				nodesToBeRemoved = append(nodesToBeRemoved, component.Nodes...)
 			}
 		}
@@ -156,4 +161,47 @@ func (g *Graph) RemoveNode(node *Node) {
 		}
 	}
 	delete(g.NodesMap, node.Code)
+}
+
+func (g *Graph) GetClosestNode(node *Node) (*Node, float64) {
+	closestDistance := 1000000000000000000000.0
+	var closestNode *Node
+	for _, wn := range g.WalkableNodes {
+		dist := utils.GetDistance(node.Latitude, node.Longitude, wn.Latitude, wn.Longitude)
+		if dist < closestDistance {
+			closestDistance = dist
+			closestNode = wn
+		}
+	}
+	return closestNode, closestDistance
+}
+
+func (g *Graph) ConnectGraphs(tree interfaces.NeighbourFinder) {
+	println(len(g.WalkableNodes))
+
+	println(len(g.MetroableNodes))
+	for _, node := range g.MetroableNodes {
+		closestNode, closestDistance := tree.GetClosest(node)
+		//closestNode, closestDistance := g.GetClosestNode(node)
+
+		// todo change walking speed
+		// m/s
+		const walkingSpeed = 4.0
+		cl := closestNode.(*Node)
+		node.AddDestination(cl, closestDistance/walkingSpeed)
+		cl.AddDestination(node, closestDistance/walkingSpeed)
+	}
+
+	println(len(g.BusableNodes))
+	for _, node := range g.BusableNodes {
+		closestNode, closestDistance := tree.GetClosest(node)
+		//closestNode, closestDistance := g.GetClosestNode(node)
+
+		// todo change walking speed
+		// m/s
+		const walkingSpeed = 4.0
+		cl := closestNode.(*Node)
+		node.AddDestination(cl, closestDistance/walkingSpeed)
+		cl.AddDestination(node, closestDistance/walkingSpeed)
+	}
 }
