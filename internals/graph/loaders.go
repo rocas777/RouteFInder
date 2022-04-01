@@ -3,6 +3,7 @@ package graph
 import (
 	"edaa/internals/utils"
 	"encoding/csv"
+	"encoding/xml"
 	"fmt"
 	"github.com/gocarina/gocsv"
 	"io/ioutil"
@@ -33,6 +34,37 @@ type tempStopTimeStruct struct {
 	StopId        string `csv:"stop_id"`
 }
 
+type Osm struct {
+	XMLName xml.Name  `xml:"osm"`
+	Nodes   []OsmNode `xml:"node"`
+	Ways    []OsmWay  `xml:"way"`
+}
+
+type OsmNode struct {
+	XMLName xml.Name `xml:"node"`
+	ID      string   `xml:"id,attr"`
+	Lat     float64  `xml:"lat,attr"`
+	Lon     float64  `xml:"lon,attr"`
+	Tags    []OsmTag `xml:"tag"`
+}
+
+type OsmTag struct {
+	XMLName xml.Name `xml:"tag"`
+	Key     string   `xml:"k,attr"`
+	Value   string   `xml:"v,attr"`
+}
+
+type OsmWay struct {
+	XMLName xml.Name `xml:"way"`
+	Nodes   []OsmND  `xml:"nd"`
+	Tags    []OsmTag `xml:"tag"`
+}
+
+type OsmND struct {
+	XMLName xml.Name `xml:"nd"`
+	Ref     string   `xml:"ref,attr"`
+}
+
 func (g *Graph) initBus() {
 
 	// load csv data into temp struct
@@ -57,6 +89,7 @@ func (g *Graph) initBus() {
 	for _, tempNode := range tempNodes {
 		node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, "bus_"+tempNode.Code)
 		g.AddNode(node)
+		g.BusableNodes[node.Code] = node
 		helperMap[tempNode.Code] = node
 	}
 
@@ -109,59 +142,85 @@ func (g *Graph) initBus() {
 }
 
 func (g *Graph) initMetro() {
-	helperMap := loadMetroStops(g)
-	loadMetroEdges(helperMap)
-}
 
-func loadMetroEdges(helperMap map[string]*Node) {
-	lines := make(map[string][]*tempStopTimeStruct)
-	in, err := os.Open("data/metro/stop_times.txt")
-	if err != nil {
-		panic(err)
-	}
-	defer func(in *os.File) {
-		err := in.Close()
+	//load nodes
+	helperMap := func(g *Graph) map[string]*Node {
+		helperMap := make(map[string]*Node)
+		in, err := os.Open("data/metro/stops.txt")
 		if err != nil {
-			panic(err.Error())
+			panic(err)
 		}
-	}(in)
-	var tempStopTimes []*tempStopTimeStruct
-	if err := gocsv.UnmarshalFile(in, &tempStopTimes); err != nil {
-		panic(err)
-	}
-	for _, stopTime := range tempStopTimes {
-		if _, ok := lines[stopTime.TripId]; ok {
-			lines[stopTime.TripId] = append(lines[stopTime.TripId], stopTime)
-		} else {
-			lines[stopTime.TripId] = make([]*tempStopTimeStruct, 1)
-			lines[stopTime.TripId][0] = stopTime
-		}
-	}
-
-	var lastNode *Node
-	var lastStopTime *tempStopTimeStruct
-	for _, line := range lines {
-		lastNode = nil
-		lastStopTime = nil
-		for _, stopTime := range line {
-			currentNode := helperMap[stopTime.StopId]
-			currentStopTime := stopTime
-			if lastNode != nil && lastStopTime != nil {
-				lastTime, _ := time.Parse("15:04:05", lastStopTime.DepartureTime)
-				currentTime, _ := time.Parse("15:04:05", currentStopTime.DepartureTime)
-
-				seconds := currentTime.Sub(lastTime)
-				lastNode.AddDestination(currentNode, seconds.Seconds())
+		defer func(in *os.File) {
+			err := in.Close()
+			if err != nil {
+				panic(err.Error())
 			}
-			lastNode = currentNode
-			lastStopTime = currentStopTime
+		}(in)
+		var tempNodes []*tempMetroNode
+		if err := gocsv.UnmarshalFile(in, &tempNodes); err != nil {
+			panic(err)
 		}
-	}
+
+		for _, tempNode := range tempNodes {
+			node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, "metro_"+tempNode.Code)
+			g.AddNode(node)
+			g.MetroableNodes[node.Code] = node
+			helperMap[tempNode.Code] = node
+		}
+		return helperMap
+	}(g)
+
+	//load edges
+	func(helperMap map[string]*Node) {
+		lines := make(map[string][]*tempStopTimeStruct)
+		in, err := os.Open("data/metro/stop_times.txt")
+		if err != nil {
+			panic(err)
+		}
+		defer func(in *os.File) {
+			err := in.Close()
+			if err != nil {
+				panic(err.Error())
+			}
+		}(in)
+		var tempStopTimes []*tempStopTimeStruct
+		if err := gocsv.UnmarshalFile(in, &tempStopTimes); err != nil {
+			panic(err)
+		}
+		for _, stopTime := range tempStopTimes {
+			if _, ok := lines[stopTime.TripId]; ok {
+				lines[stopTime.TripId] = append(lines[stopTime.TripId], stopTime)
+			} else {
+				lines[stopTime.TripId] = make([]*tempStopTimeStruct, 1)
+				lines[stopTime.TripId][0] = stopTime
+			}
+		}
+
+		var lastNode *Node
+		var lastStopTime *tempStopTimeStruct
+		for _, line := range lines {
+			lastNode = nil
+			lastStopTime = nil
+			for _, stopTime := range line {
+				currentNode := helperMap[stopTime.StopId]
+				currentStopTime := stopTime
+				if lastNode != nil && lastStopTime != nil {
+					lastTime, _ := time.Parse("15:04:05", lastStopTime.DepartureTime)
+					currentTime, _ := time.Parse("15:04:05", currentStopTime.DepartureTime)
+
+					seconds := currentTime.Sub(lastTime)
+					lastNode.AddDestination(currentNode, seconds.Seconds())
+				}
+				lastNode = currentNode
+				lastStopTime = currentStopTime
+			}
+		}
+	}(helperMap)
 }
 
-func loadMetroStops(g *Graph) map[string]*Node {
+func (g *Graph) initRoads() {
 	helperMap := make(map[string]*Node)
-	in, err := os.Open("data/metro/stops.txt")
+	in, err := os.Open("data/road/compressed.xml")
 	if err != nil {
 		panic(err)
 	}
@@ -171,15 +230,51 @@ func loadMetroStops(g *Graph) map[string]*Node {
 			panic(err.Error())
 		}
 	}(in)
-	var tempNodes []*tempMetroNode
-	if err := gocsv.UnmarshalFile(in, &tempNodes); err != nil {
+	roadsData, _ := ioutil.ReadAll(in)
+	var osm Osm
+	if err := xml.Unmarshal(roadsData, &osm); err != nil {
 		panic(err)
 	}
 
-	for _, tempNode := range tempNodes {
-		node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, "metro_"+tempNode.Code)
-		g.AddNode(node)
-		helperMap[tempNode.Code] = node
+	for _, node := range osm.Nodes {
+		isStation := false
+		for _, tag := range node.Tags {
+			if (tag.Key == "highway" && tag.Value == "bus_stop") || (tag.Key == "station" && tag.Value == "subway") {
+				isStation = true
+				break
+			}
+		}
+		if isStation {
+			helperMap[node.ID] = NewStationNode(node.Lat, node.Lon, "", "", node.ID)
+		} else {
+			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", node.ID)
+		}
 	}
-	return helperMap
+
+	for _, way := range osm.Ways {
+		isTwoWay := true
+		for _, tag := range way.Tags {
+			if tag.Key == "oneway" && tag.Value == "yes" {
+				isTwoWay = false
+				break
+			}
+		}
+		var lastNode *Node
+		for _, node := range way.Nodes {
+			if lastNode == nil {
+				lastNode = helperMap[node.Ref]
+			} else {
+				currentNode := helperMap[node.Ref]
+				dist := utils.GetDistance(lastNode.latitude, lastNode.longitude, currentNode.latitude, currentNode.longitude)
+				lastNode.AddDestination(currentNode, dist)
+				if isTwoWay {
+					currentNode.AddDestination(lastNode, dist)
+				}
+			}
+		}
+	}
+	for _, node := range helperMap {
+		g.AddNode(node)
+		g.WalkableNodes[node.Code] = node
+	}
 }

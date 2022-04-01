@@ -75,10 +75,11 @@ func main() {
 	//filter nodes by ways and tags
 	var newNodes osm.Nodes
 	for _, n := range nodes {
-		tag := n.Tags.Find(filter)
+		//add if relate dto highway or in a way
+		/*tag := n.Tags.Find(filter)
 		if tag != "" {
 			newNodes = append(newNodes, n)
-		} else if _, ok := nodesInWay[n.ID]; ok {
+		} else*/if _, ok := nodesInWay[n.ID]; ok {
 			newNodes = append(newNodes, n)
 		}
 	}

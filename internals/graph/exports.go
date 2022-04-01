@@ -20,7 +20,7 @@ type exportEdge struct {
 }
 
 func newExportNode(node *Node) *exportNode {
-	return &exportNode{Latitude: node.latitude, Longitude: node.longitude, IsStation: node.isStation, Name: node.name, Zone: node.zone, Code: node.Code}
+	return &exportNode{Latitude: node.latitude, Longitude: node.longitude, IsStation: node.IsStation, Name: node.name, Zone: node.zone, Code: node.Code}
 }
 func newExportEdge(edge *Edge) *exportEdge {
 	return &exportEdge{From: edge.From.Code, To: edge.To.Code, Weight: edge.Weight}
