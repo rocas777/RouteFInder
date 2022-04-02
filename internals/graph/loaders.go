@@ -34,33 +34,33 @@ type tempStopTimeStruct struct {
 	StopId        string `csv:"stop_id"`
 }
 
-type Osm struct {
+type osm struct {
 	XMLName xml.Name  `xml:"osm"`
-	Nodes   []OsmNode `xml:"node"`
-	Ways    []OsmWay  `xml:"way"`
+	Nodes   []osmNode `xml:"node"`
+	Ways    []osmWay  `xml:"way"`
 }
 
-type OsmNode struct {
+type osmNode struct {
 	XMLName xml.Name `xml:"node"`
 	ID      string   `xml:"id,attr"`
 	Lat     float64  `xml:"lat,attr"`
 	Lon     float64  `xml:"lon,attr"`
-	Tags    []OsmTag `xml:"tag"`
+	Tags    []osmTag `xml:"tag"`
 }
 
-type OsmTag struct {
+type osmTag struct {
 	XMLName xml.Name `xml:"tag"`
 	Key     string   `xml:"k,attr"`
 	Value   string   `xml:"v,attr"`
 }
 
-type OsmWay struct {
+type osmWay struct {
 	XMLName xml.Name `xml:"way"`
-	Nodes   []OsmND  `xml:"nd"`
-	Tags    []OsmTag `xml:"tag"`
+	Nodes   []osmND  `xml:"nd"`
+	Tags    []osmTag `xml:"tag"`
 }
 
-type OsmND struct {
+type osmND struct {
 	XMLName xml.Name `xml:"nd"`
 	Ref     string   `xml:"ref,attr"`
 }
@@ -83,16 +83,16 @@ func (g *Graph) initBus() {
 		panic(err)
 	}
 
-	// pass temp structure data To final node
+	// pass temp structure data to final node
 	// create map for faster initialization
 	for _, tempNode := range tempNodes {
 		node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, "bus_"+tempNode.Code)
+		g.busableNodes[node.id] = node
 		g.AddNode(node)
-		g.BusableNodes[node.Code] = node
 		helperMap[tempNode.Code] = node
 	}
 
-	// read files From lines directory
+	// read files from lines directory
 	files, err := ioutil.ReadDir("data/bus/lines")
 	if err != nil {
 		log.Panic(err)
@@ -116,14 +116,14 @@ func (g *Graph) initBus() {
 				currentNode := helperMap[line[0]]
 				if i != 0 {
 					if lastNode != nil {
-						totalDistance += utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude)
+						totalDistance += utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude)
 					}
 					lastNode = currentNode
 				}
 			}
 
 			lastNode = nil
-			// setup Edges
+			// setup outEdges
 			for i, line := range csvLines {
 				if i == 0 {
 					totalTime = float64(utils.StringToInt(line[0])) * 60
@@ -131,8 +131,8 @@ func (g *Graph) initBus() {
 					currentNode := helperMap[line[0]]
 
 					if lastNode != nil {
-						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
-						// currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.Latitude, currentNode.Longitude, lastNode.Latitude, lastNode.Longitude))
+						lastNode.AddDestination(currentNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
+						// currentNode.AddDestination(lastNode, totalTime/totalDistance*utils.GetDistance(currentNode.latitude, currentNode.longitude, lastNode.latitude, lastNode.longitude))
 					}
 					lastNode = currentNode
 				}
@@ -164,13 +164,13 @@ func (g *Graph) initMetro() {
 		for _, tempNode := range tempNodes {
 			node := NewStationNode(tempNode.Latitude, tempNode.Longitude, tempNode.Name, tempNode.Zone, "metro_"+tempNode.Code)
 			g.AddNode(node)
-			g.MetroableNodes[node.Code] = node
+			g.metroableNodes[node.id] = node
 			helperMap[tempNode.Code] = node
 		}
 		return helperMap
 	}(g)
 
-	//load edges
+	//load outEdges
 	func(helperMap map[string]*Node) {
 		lines := make(map[string][]*tempStopTimeStruct)
 		in, err := os.Open("data/metro/stop_times.txt")
@@ -231,7 +231,7 @@ func (g *Graph) initRoads() {
 		}
 	}(in)
 	roadsData, _ := ioutil.ReadAll(in)
-	var osm Osm
+	var osm osm
 	if err := xml.Unmarshal(roadsData, &osm); err != nil {
 		panic(err)
 	}
@@ -245,7 +245,7 @@ func (g *Graph) initRoads() {
 			}
 		}
 		if isStation {
-			//helperMap[node.ID] = NewStationNode(node.Lat, node.Lon, "", "", node.ID)
+			//helperMap[node.ID] = NewStationNode(node.Latitude, node.Longitude, "", "", node.ID)
 			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
 		} else {
 			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
@@ -266,7 +266,7 @@ func (g *Graph) initRoads() {
 			if lastNode == nil {
 				lastNode = currentNode
 			} else {
-				dist := utils.GetDistance(lastNode.Latitude, lastNode.Longitude, currentNode.Latitude, currentNode.Longitude)
+				dist := utils.GetDistance(lastNode.latitude, lastNode.longitude, currentNode.latitude, currentNode.longitude)
 				lastNode.AddDestination(currentNode, dist)
 				if isTwoWay {
 					currentNode.AddDestination(lastNode, dist)
@@ -277,6 +277,6 @@ func (g *Graph) initRoads() {
 	}
 	for _, node := range helperMap {
 		g.AddNode(node)
-		g.WalkableNodes[node.Code] = node
+		g.walkableNodes[node.id] = node
 	}
 }
