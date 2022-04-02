@@ -3,9 +3,9 @@ package main
 import (
 	"edaa/internals/algorithms/connectivity/tarjan"
 	"edaa/internals/dataStructures/kdtree"
+	"edaa/internals/exports/reuse"
 	"edaa/internals/graph"
 	"edaa/internals/graph/filtering"
-	"edaa/internals/interfaces"
 )
 
 func main() {
@@ -17,9 +17,12 @@ func main() {
 	filtering.ConnectGraphs(&g, tree)
 
 	disconnectedComponents, number := tarjan.TarjanGetStronglyConnectedComponents(&g)
-	printStronglyConnectedComponentsSizes(number, disconnectedComponents)
+	tarjan.PrintStronglyConnectedComponentsSizes(number, disconnectedComponents)
 
 	filtering.Condensate(&g)
+
+	reuse.ExportEdges(&g, "data/reuse/edges.csv")
+	reuse.ExportNodes(&g, "data/reuse/nodes.csv")
 }
 
 func cleanGraph(g *graph.Graph) { // filter isolated nodes
@@ -30,13 +33,4 @@ func cleanGraph(g *graph.Graph) { // filter isolated nodes
 
 	// remove nodes that are in an isolated strongly connected component
 	filtering.RemoveUnconnectedNodes(g, disconnectedComponents)
-}
-
-// prints the size of each StronglyConnectedComponentsSizes
-func printStronglyConnectedComponentsSizes(number int64, disconnectedComponents [][]interfaces.SCC) {
-	for _, components := range disconnectedComponents {
-		for _, component := range components {
-			println(component.Nodes()[0].Id(), len(component.Nodes()))
-		}
-	}
 }

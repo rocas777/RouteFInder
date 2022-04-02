@@ -98,7 +98,7 @@ func (g *Graph) Init() {
 	g.metroableNodes = make(map[string]interfaces.Node)
 	start := time.Now()
 
-	g.initBus()
+	InitBus(g)
 	println("Bus size:", len(g.nodes))
 
 	elapsed := time.Since(start)
@@ -106,7 +106,7 @@ func (g *Graph) Init() {
 
 	start = time.Now()
 
-	g.initMetro()
+	InitMetro(g)
 	println("Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)
@@ -114,7 +114,7 @@ func (g *Graph) Init() {
 
 	start = time.Now()
 
-	g.initRoads()
+	InitRoads(g)
 	println("Roads+Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)

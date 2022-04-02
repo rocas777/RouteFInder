@@ -20,6 +20,15 @@ var unexplored map[string]bool
 var components []interfaces.SCC
 var disconnectedComponents [][]interfaces.SCC
 
+// prints the size of each StronglyConnectedComponentsSizes
+func PrintStronglyConnectedComponentsSizes(number int64, disconnectedComponents [][]interfaces.SCC) {
+	for _, c := range disconnectedComponents {
+		for _, component := range c {
+			println(component.Nodes()[0].Id(), len(component.Nodes()))
+		}
+	}
+}
+
 func TarjanGetStronglyConnectedComponents(g interfaces.Graph) ([][]interfaces.SCC, int64) {
 	index = 0
 	counter = 0
