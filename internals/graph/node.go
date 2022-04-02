@@ -101,19 +101,24 @@ func (n *Node) AddDestination(destination interfaces.Node, weight float64) {
 	destination.SetInEdges(append(destination.InEdges(), NewEdge(n, destination, weight)))
 }
 
-func (n *Node) RemoveEdge(node *Node) {
+func (n *Node) RemoveOutEdge(node interfaces.Node) {
 	for i, edge := range n.outEdges {
-		if edge.To().Id() == node.id {
+		if edge.To().Id() == node.Id() {
 			n.outEdges = append(n.outEdges[:i], n.outEdges[i+1:]...)
 			return
 		}
 	}
 }
-func (n *Node) RemoveIncomingEdge(node *Node) {
+func (n *Node) RemoveInEdge(node interfaces.Node) {
 	for i, edge := range n.inEdges {
-		if edge.To().Id() == node.id {
+		if edge.To().Id() == node.Id() {
 			n.inEdges = append(n.inEdges[:i], n.inEdges[i+1:]...)
 			return
 		}
 	}
+}
+
+func (n *Node) RemoveConnections(nodeToRemove interfaces.Node) {
+	n.RemoveInEdge(nodeToRemove)
+	n.RemoveOutEdge(nodeToRemove)
 }

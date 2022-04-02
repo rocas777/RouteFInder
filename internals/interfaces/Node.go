@@ -29,4 +29,5 @@ type Node interface {
 	SetIsStation(isStation bool)
 
 	AddDestination(destination Node, weight float64)
+	RemoveConnections(nodeToRemove Node)
 }
