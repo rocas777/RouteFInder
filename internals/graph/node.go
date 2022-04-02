@@ -12,6 +12,9 @@ type Node struct {
 	id         string
 	referenced bool
 	isStation  bool
+	visited    bool
+	distance   float64
+	previous   string
 }
 
 func (n *Node) OutEdges() []interfaces.Edge {
@@ -84,6 +87,30 @@ func (n *Node) IsStation() bool {
 
 func (n *Node) SetIsStation(isStation bool) {
 	n.isStation = isStation
+}
+
+func (n *Node) Visited() bool {
+	return n.visited
+}
+
+func (n *Node) SetVisited(visited bool) {
+	n.visited = visited
+}
+
+func (n *Node) Distance() float64 {
+	return n.distance
+}
+
+func (n *Node) SetDistance(distance float64) {
+	n.distance = distance
+}
+
+func (n *Node) Previous() string {
+	return n.previous
+}
+
+func (n *Node) SetPrevious(previous string) {
+	n.previous = previous
 }
 
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {

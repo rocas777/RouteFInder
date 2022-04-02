@@ -20,9 +20,14 @@ type Graph struct {
 	minLon         float64
 }
 
+func NewGraph() *Graph {
+	return &Graph{nodesMap: make(map[string]interfaces.Node)}
+}
+	
 func (g *Graph) Nodes() []interfaces.Node {
 	return g.nodes
 }
+
 func (g *Graph) SetNodes(nodes []interfaces.Node) {
 	g.nodes = nodes
 }

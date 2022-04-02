@@ -37,3 +37,23 @@ func PrintMemUsage() {
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }
+
+func RemoveString(stringList []string, element string) []string {
+	var index int = containsString(stringList, element);
+	
+	if index != -1 {
+		stringList[index] = stringList[len(stringList)-1];
+		return stringList[:len(stringList)-1]
+	}
+	
+	return stringList
+}
+
+func containsString(stringList []string, element string) int {
+	for i, v := range stringList {
+		if v == element {
+			return i
+		}
+	}
+	return -1
+}

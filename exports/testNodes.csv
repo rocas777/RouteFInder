@@ -1,0 +1,17 @@
+Latitude,Longitude,IsStation,Name,Zone,Code
+0,0,false,"node0,0",zone0,node0
+0,1,false,"node0,1",zone0,node1
+0,2,false,"node0,2",zone0,node2
+0,3,false,"node0,3",zone0,node3
+1,0,false,"node1,0",zone0,node4
+1,1,false,"node1,1",zone0,node5
+1,2,false,"node1,2",zone0,node6
+1,3,false,"node1,3",zone0,node7
+2,0,false,"node2,0",zone0,node8
+2,1,false,"node2,1",zone0,node9
+2,2,false,"node2,2",zone0,node10
+2,3,false,"node2,3",zone0,node11
+3,0,false,"node3,0",zone0,node12
+3,1,false,"node3,1",zone0,node13
+3,2,false,"node3,2",zone0,node14
+3,3,false,"node3,3",zone0,node15
