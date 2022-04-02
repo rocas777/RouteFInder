@@ -48,9 +48,9 @@ except nx.NetworkXError:
     print('Error drawing metro nodes')
 
 # Draw Walk Nodes
-try: nx.draw_networkx_nodes(G, pos, nodelist=walkNodes, node_size=25, node_color='tab:green', alpha=0.9)
-except nx.NetworkXError:
-    print('Error drawing walk nodes')
+#try: nx.draw_networkx_nodes(G, pos, nodelist=walkNodes, node_size=25, node_color='tab:green', alpha=0.9)
+#except nx.NetworkXError:
+#    print('Error drawing walk nodes')
 
 # Draw Bus Edges
 try: nx.draw_networkx_edges(G, pos, edgelist=busEdges, edge_color='tab:blue')
@@ -63,9 +63,9 @@ except nx.NetworkXError:
     print('Error drawing metro edges')
 
 # Draw Walk Edges
-try: nx.draw_networkx_edges(G, pos, edgelist=walkEdges, edge_color='tab:green')
-except nx.NetworkXError:
-    print('Error drawing walk edges')
+#try: nx.draw_networkx_edges(G, pos, edgelist=walkEdges, edge_color='tab:green')
+#except nx.NetworkXError:
+#    print('Error drawing walk edges')
 
 # Draw Labels
 #nx.draw_networkx_labels(G, pos, font_size=10)
