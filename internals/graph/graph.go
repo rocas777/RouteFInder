@@ -9,26 +9,97 @@ import (
 )
 
 type Graph struct {
-	Nodes          []*Node
-	NodesMap       map[string]*Node
-	WalkableNodes  map[string]*Node
-	BusableNodes   map[string]*Node
-	MetroableNodes map[string]*Node
+	nodes          []interfaces.Node
+	nodesMap       map[string]interfaces.Node
+	walkableNodes  map[string]interfaces.Node
+	busableNodes   map[string]interfaces.Node
+	metroableNodes map[string]interfaces.Node
 	maxLat         float64
 	minLat         float64
 	maxLon         float64
 	minLon         float64
 }
 
+func (g *Graph) Nodes() []interfaces.Node {
+	return g.nodes
+}
+func (g *Graph) SetNodes(nodes []interfaces.Node) {
+	g.nodes = nodes
+}
+
+func (g *Graph) NodesMap() map[string]interfaces.Node {
+	return g.nodesMap
+}
+
+func (g *Graph) SetNodesMap(nodesMap map[string]interfaces.Node) {
+	g.nodesMap = nodesMap
+}
+
+func (g *Graph) WalkableNodes() map[string]interfaces.Node {
+	return g.walkableNodes
+}
+
+func (g *Graph) SetWalkableNodes(walkableNodes map[string]interfaces.Node) {
+	g.walkableNodes = walkableNodes
+}
+
+func (g *Graph) BusableNodes() map[string]interfaces.Node {
+	return g.busableNodes
+}
+
+func (g *Graph) SetBusableNodes(busableNodes map[string]interfaces.Node) {
+	g.busableNodes = busableNodes
+}
+
+func (g *Graph) MetroableNodes() map[string]interfaces.Node {
+	return g.metroableNodes
+}
+
+func (g *Graph) SetMetroableNodes(metroableNodes map[string]interfaces.Node) {
+	g.metroableNodes = metroableNodes
+}
+
+func (g *Graph) MaxLat() float64 {
+	return g.maxLat
+}
+
+func (g *Graph) SetMaxLat(maxLat float64) {
+	g.maxLat = maxLat
+}
+
+func (g *Graph) MinLat() float64 {
+	return g.minLat
+}
+
+func (g *Graph) SetMinLat(minLat float64) {
+	g.minLat = minLat
+}
+
+func (g *Graph) MaxLon() float64 {
+	return g.maxLon
+}
+
+func (g *Graph) SetMaxLon(maxLon float64) {
+	g.maxLon = maxLon
+}
+
+func (g *Graph) MinLon() float64 {
+	return g.minLon
+}
+
+func (g *Graph) SetMinLon(minLon float64) {
+	g.minLon = minLon
+}
+
 func (g *Graph) Init() {
-	g.NodesMap = make(map[string]*Node)
-	g.WalkableNodes = make(map[string]*Node)
-	g.BusableNodes = make(map[string]*Node)
-	g.MetroableNodes = make(map[string]*Node)
+	g.nodesMap = make(map[string]interfaces.Node)
+	g.walkableNodes = make(map[string]interfaces.Node)
+	g.busableNodes = make(map[string]interfaces.Node)
+	g.metroableNodes = make(map[string]interfaces.Node)
 	start := time.Now()
 
 	g.initBus()
-	println("Bus size:", len(g.Nodes))
+	println("Bus size:", len(g.nodes))
 
 	elapsed := time.Since(start)
 	fmt.Printf("Bus initiation %s\n\n", elapsed)
@@ -36,7 +107,7 @@ func (g *Graph) Init() {
 	start = time.Now()
 
 	g.initMetro()
-	println("Metro+Bus size:", len(g.Nodes))
+	println("Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)
 	fmt.Printf("Metro initiation %s\n\n", elapsed)
@@ -44,54 +115,43 @@ func (g *Graph) Init() {
 	start = time.Now()
 
 	g.initRoads()
-	println("Roads+Metro+Bus size:", len(g.Nodes))
+	println("Roads+Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)
 	fmt.Printf("Roads initiation %s\n\n", elapsed)
 }
 
-func (g *Graph) fastGetNode(code string) (*Node, error) {
-	return g.NodesMap[code], nil
+func (g *Graph) fastGetNode(code string) (interfaces.Node, error) {
+	return g.nodesMap[code], nil
 }
 
-func (g *Graph) FilterNodes() {
-	nodesCopy := g.Nodes
-	g.Nodes = make([]*Node, 0)
-	g.NodesMap = make(map[string]*Node)
-	for _, node := range nodesCopy {
-		if node.Referenced {
-			g.AddNode(node)
-		}
-	}
-}
-
-func (g *Graph) slowGetNode(code string) (*Node, error) {
-	for _, node := range g.Nodes {
-		if node.Code == code {
+func (g *Graph) slowGetNode(code string) (interfaces.Node, error) {
+	for _, node := range g.nodes {
+		if node.Id() == code {
 			return node, nil
 		}
 	}
 	return nil, &syntax.Error{}
 }
 
-func (g *Graph) GetNode(code string) (*Node, error) {
+func (g *Graph) GetNode(code string) (interfaces.Node, error) {
 	return g.fastGetNode(code)
 	return g.slowGetNode(code)
 }
 
-func (g *Graph) AddNode(node *Node) {
+func (g *Graph) AddNode(node interfaces.Node) {
 	g.maxLat = 0
 	g.maxLon = 0
 	g.minLat = 0
 	g.minLon = 0
-	g.NodesMap[node.Code] = node
-	g.Nodes = append(g.Nodes, node)
+	g.nodesMap[node.Id()] = node
+	g.nodes = append(g.nodes, node)
 }
 
-func (g *Graph) GetEdges() []*Edge {
-	var outEdges []*Edge
-	for _, node := range g.Nodes {
-		outEdges = append(outEdges, node.Edges...)
+func (g *Graph) GetEdges() []interfaces.Edge {
+	var outEdges []interfaces.Edge
+	for _, node := range g.nodes {
+		outEdges = append(outEdges, node.OutEdges()...)
 	}
 	return outEdges
 }
@@ -103,105 +163,54 @@ func (g *Graph) GetCoordsBox() (float64, float64, float64, float64) {
 		g.minLat = 10000
 		g.minLon = 10000
 
-		for _, node := range g.Nodes {
-			if node.Latitude >= g.maxLat {
-				g.maxLat = node.Latitude
-			} else if node.Latitude <= g.minLat {
-				g.minLat = node.Latitude
+		for _, node := range g.nodes {
+			if node.Latitude() >= g.maxLat {
+				g.maxLat = node.Latitude()
+			} else if node.Latitude() <= g.minLat {
+				g.minLat = node.Latitude()
 			}
 
-			if node.Longitude >= g.maxLon {
-				g.maxLon = node.Longitude
-			} else if node.Longitude <= g.minLon {
-				g.minLon = node.Longitude
+			if node.Longitude() >= g.maxLon {
+				g.maxLon = node.Longitude()
+			} else if node.Longitude() <= g.minLon {
+				g.minLon = node.Longitude()
 			}
 		}
 	}
 	return g.maxLat, g.minLat, g.maxLon, g.minLon
 }
 
-// removes every node that does not belong to the biggest SCC and does not include a station
-func (g *Graph) RemoveUnconnectedNodes(disconnectedComponents [][]*SCC) {
-	biggestScc := 0
-	for _, components := range disconnectedComponents {
-		for _, component := range components {
-			if biggestScc <= len(component.Nodes) {
-				biggestScc = len(component.Nodes)
-			}
-		}
-	}
-	nodesToBeRemoved := make([]*Node, 0)
-	for _, components := range disconnectedComponents {
-		for _, component := range components {
-			if len(component.Nodes) < biggestScc && !component.HasStation {
-				nodesToBeRemoved = append(nodesToBeRemoved, component.Nodes...)
-			}
-		}
-	}
-	g.RemoveNodes(nodesToBeRemoved)
-}
-
-func (g *Graph) RemoveNodes(nodes []*Node) {
+func (g *Graph) RemoveNodes(nodes []interfaces.Node) {
 	for _, n := range nodes {
-		delete(g.NodesMap, n.Code)
+		delete(g.nodesMap, n.Id())
 	}
-	g.Nodes = make([]*Node, len(g.NodesMap))
+	g.nodes = make([]interfaces.Node, len(g.nodesMap))
 	counter := 0
-	for _, n := range g.NodesMap {
-		g.Nodes[counter] = n
+	for _, n := range g.nodesMap {
+		g.nodes[counter] = n
 		counter++
 	}
 }
 
 func (g *Graph) RemoveNode(node *Node) {
-	for i, n := range g.Nodes {
-		if n.Code == node.Code {
-			g.Nodes = append(g.Nodes[:i], g.Nodes[i+1:]...)
+	for i, n := range g.nodes {
+		if n.Id() == node.id {
+			g.nodes = append(g.nodes[:i], g.nodes[i+1:]...)
 			break
 		}
 	}
-	delete(g.NodesMap, node.Code)
+	delete(g.nodesMap, node.id)
 }
 
-func (g *Graph) GetClosestNode(node *Node) (*Node, float64) {
+func (g *Graph) GetClosestNode(node interfaces.Node) (interfaces.Node, float64) {
 	closestDistance := 1000000000000000000000.0
-	var closestNode *Node
-	for _, wn := range g.WalkableNodes {
-		dist := utils.GetDistance(node.Latitude, node.Longitude, wn.Latitude, wn.Longitude)
+	var closestNode interfaces.Node
+	for _, wn := range g.walkableNodes {
+		dist := utils.GetDistance(node.Latitude(), node.Longitude(), wn.Latitude(), wn.Longitude())
 		if dist < closestDistance {
 			closestDistance = dist
 			closestNode = wn
 		}
 	}
 	return closestNode, closestDistance
-}
-
-func (g *Graph) ConnectGraphs(tree interfaces.NeighbourFinder) {
-	println(len(g.WalkableNodes))
-
-	println(len(g.MetroableNodes))
-	for _, node := range g.MetroableNodes {
-		closestNode, closestDistance := tree.GetClosest(node)
-		//closestNode, closestDistance := g.GetClosestNode(node)
-
-		// todo change walking speed
-		// m/s
-		const walkingSpeed = 4.0
-		cl := closestNode.(*Node)
-		node.AddDestination(cl, closestDistance/walkingSpeed)
-		cl.AddDestination(node, closestDistance/walkingSpeed)
-	}
-
-	println(len(g.BusableNodes))
-	for _, node := range g.BusableNodes {
-		closestNode, closestDistance := tree.GetClosest(node)
-		//closestNode, closestDistance := g.GetClosestNode(node)
-
-		// todo change walking speed
-		// m/s
-		const walkingSpeed = 4.0
-		cl := closestNode.(*Node)
-		node.AddDestination(cl, closestDistance/walkingSpeed)
-		cl.AddDestination(node, closestDistance/walkingSpeed)
-	}
 }
