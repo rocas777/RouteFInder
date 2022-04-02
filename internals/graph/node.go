@@ -10,6 +10,9 @@ type Node struct {
 	Code          string
 	Referenced    bool
 	IsStation     bool
+	Visited		  bool
+	Distance	  float64
+	Previous	  string
 }
 
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {

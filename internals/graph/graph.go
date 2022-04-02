@@ -18,6 +18,10 @@ type Graph struct {
 	minLon         float64
 }
 
+func NewGraph() *Graph {
+	return &Graph{NodesMap: make(map[string]*Node)}
+}
+
 func (g *Graph) Init() {
 	g.NodesMap = make(map[string]*Node)
 	start := time.Now()

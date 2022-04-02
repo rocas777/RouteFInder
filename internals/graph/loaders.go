@@ -66,6 +66,7 @@ type OsmND struct {
 }
 
 func (g *Graph) initBus() {
+	g.BusableNodes = make(map[string]*Node)
 
 	// load csv data into temp struct
 	helperMap := make(map[string]*Node)
@@ -142,6 +143,7 @@ func (g *Graph) initBus() {
 }
 
 func (g *Graph) initMetro() {
+	g.MetroableNodes = make(map[string]*Node)
 
 	//load nodes
 	helperMap := func(g *Graph) map[string]*Node {
@@ -219,6 +221,8 @@ func (g *Graph) initMetro() {
 }
 
 func (g *Graph) initRoads() {
+	g.WalkableNodes = make(map[string]*Node)
+	
 	helperMap := make(map[string]*Node)
 	in, err := os.Open("data/road/compressed.xml")
 	if err != nil {
