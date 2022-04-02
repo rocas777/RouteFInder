@@ -13,14 +13,11 @@ func main() {
 	g := graph.NewGraph()
 	buildTestGraph(g)
 	
-	distance.DijkstraForNode(g, g.NodesMap["node0"])
+	distance.DijkstraForNode(g, g.NodesMap()["node0"])
 	
-	for _, n := range g.NodesMap {
-		fmt.Println(n.Code, "with dist", n.Distance)
+	for _, n := range g.NodesMap() {
+		fmt.Println(n.Id(), "with dist", n.Distance())
 	}
-
-	g.ExportNodes("exports/testNodes.csv")
-	g.ExportEdges("exports/testEdges.csv")
 }
 
 func buildTestGraph(g *graph.Graph) {

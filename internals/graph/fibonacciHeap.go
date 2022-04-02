@@ -2,6 +2,7 @@ package graph
 
 import (
 	"edaa/internals/utils"
+	"edaa/internals/interfaces"
 	"fmt"
 )
 
@@ -15,8 +16,8 @@ func NewFibHeap() *FibHeap {
 	return &FibHeap{NodesMap: make(map[string]*FibHeapNode), minRoot: ""}
 }
 
-func (heap *FibHeap) AddNode(n *Node, key float64) *FibHeapNode {
-	var heapNode *FibHeapNode = NewFibHeapNode(key, n.Code);
+func (heap *FibHeap) AddNode(n interfaces.Node, key float64) *FibHeapNode {
+	var heapNode *FibHeapNode = NewFibHeapNode(key, n.Id());
 	
 	heap.Roots = append(heap.Roots, heapNode.Code)
 	heap.NodesMap[heapNode.Code] = heapNode;
@@ -41,7 +42,6 @@ func (heap *FibHeap) PopMin() string {
 	//merge roots of same degree
 	var i, j = heap.sameDegreeRoots();
 	for i != "" {
-		fmt.Println(i, j)
 		var nodeI *FibHeapNode = heap.NodesMap[i];
 		var nodeJ *FibHeapNode = heap.NodesMap[j];
 		
@@ -71,10 +71,8 @@ func (heap *FibHeap) PopMin() string {
 }
 
 func (heap *FibHeap) sameDegreeRoots() (string, string) {
-	fmt.Println(len(heap.Roots))
 	for i := 0; i < len(heap.Roots)-1; i++ {
 		for j := i+1; j < len(heap.Roots); j++ {
-			fmt.Println(i, j)
 			if heap.NodesMap[heap.Roots[i]].Degree == heap.NodesMap[heap.Roots[j]].Degree {
 				return heap.Roots[i], heap.Roots[j];
 			}

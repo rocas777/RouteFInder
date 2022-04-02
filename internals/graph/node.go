@@ -1,48 +1,151 @@
 package graph
 
+import "edaa/internals/interfaces"
+
 type Node struct {
-	Edges         []*Edge
-	IncomingEdges []*Edge
-	latitude      float64
-	longitude     float64
-	name          string
-	zone          string
-	Code          string
-	Referenced    bool
-	IsStation     bool
-	Visited		  bool
-	Distance	  float64
-	Previous	  string
+	outEdges   []interfaces.Edge
+	inEdges    []interfaces.Edge
+	latitude   float64
+	longitude  float64
+	name       string
+	zone       string
+	id         string
+	referenced bool
+	isStation  bool
+	visited    bool
+	distance   float64
+	previous   string
+}
+
+func (n *Node) OutEdges() []interfaces.Edge {
+	return n.outEdges
+}
+
+func (n *Node) SetOutEdges(outEdges []interfaces.Edge) {
+	n.outEdges = outEdges
+}
+
+func (n *Node) InEdges() []interfaces.Edge {
+	return n.inEdges
+}
+
+func (n *Node) SetInEdges(inEdges []interfaces.Edge) {
+	n.inEdges = inEdges
+}
+
+func (n *Node) Latitude() float64 {
+	return n.latitude
+}
+
+func (n *Node) SetLatitude(latitude float64) {
+	n.latitude = latitude
+}
+
+func (n *Node) Longitude() float64 {
+	return n.longitude
+}
+
+func (n *Node) SetLongitude(longitude float64) {
+	n.longitude = longitude
+}
+
+func (n *Node) Name() string {
+	return n.name
+}
+
+func (n *Node) SetName(name string) {
+	n.name = name
+}
+
+func (n *Node) Zone() string {
+	return n.zone
+}
+
+func (n *Node) SetZone(zone string) {
+	n.zone = zone
+}
+
+func (n *Node) Id() string {
+	return n.id
+}
+
+func (n *Node) SetId(id string) {
+	n.id = id
+}
+
+func (n *Node) Referenced() bool {
+	return n.referenced
+}
+
+func (n *Node) SetReferenced(referenced bool) {
+	n.referenced = referenced
+}
+
+func (n *Node) IsStation() bool {
+	return n.isStation
+}
+
+func (n *Node) SetIsStation(isStation bool) {
+	n.isStation = isStation
+}
+
+func (n *Node) Visited() bool {
+	return n.visited
+}
+
+func (n *Node) SetVisited(visited bool) {
+	n.visited = visited
+}
+
+func (n *Node) Distance() float64 {
+	return n.distance
+}
+
+func (n *Node) SetDistance(distance float64) {
+	n.distance = distance
+}
+
+func (n *Node) Previous() string {
+	return n.previous
+}
+
+func (n *Node) SetPrevious(previous string) {
+	n.previous = previous
 }
 
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
-	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, Code: code, IsStation: true, Referenced: false}
+	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, id: code, isStation: true, referenced: false}
 }
 
 func NewNormalNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
-	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, Code: code, IsStation: false}
+	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, id: code, isStation: false, referenced: false}
 }
 
-func (n *Node) AddDestination(destination *Node, weight float64) {
-	destination.Referenced = true
-	n.Referenced = true
-	n.Edges = append(n.Edges, NewEdge(n, destination, weight))
-	n.IncomingEdges = append(n.IncomingEdges, NewEdge(destination, n, weight))
+func (n *Node) AddDestination(destination interfaces.Node, weight float64) {
+	destination.SetReferenced(true)
+	n.referenced = true
+	n.outEdges = append(n.outEdges, NewEdge(n, destination, weight))
+	destination.SetInEdges(append(destination.InEdges(), NewEdge(n, destination, weight)))
 }
 
-func (n *Node) RemoveEdge(node *Node) {
-	for i, edge := range n.Edges {
-		if edge.To.Code == node.Code {
-			n.Edges = append(n.Edges[:i], n.Edges[i+1:]...)
+func (n *Node) RemoveOutEdge(node interfaces.Node) {
+	for i, edge := range n.outEdges {
+		if edge.To().Id() == node.Id() {
+			n.outEdges = append(n.outEdges[:i], n.outEdges[i+1:]...)
 			return
 		}
 	}
 }
-func (n *Node) RemoveIncomingEdge(node *Node) {
-	for i, edge := range n.IncomingEdges {
-		if edge.To.Code == node.Code {
-			n.Edges = append(n.IncomingEdges[:i], n.IncomingEdges[i+1:]...)
+func (n *Node) RemoveInEdge(node interfaces.Node) {
+	for i, edge := range n.inEdges {
+		if edge.To().Id() == node.Id() {
+			n.inEdges = append(n.inEdges[:i], n.inEdges[i+1:]...)
 			return
 		}
 	}
+}
+
+func (n *Node) RemoveConnections(nodeToRemove interfaces.Node) {
+	n.RemoveInEdge(nodeToRemove)
+	n.RemoveOutEdge(nodeToRemove)
 }
