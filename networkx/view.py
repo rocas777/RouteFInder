@@ -4,8 +4,8 @@ import numpy as np
 
 G = nx.MultiGraph()
 
-graph_data_nodes = np.loadtxt('data/reuse/nodes.csv', dtype='str', delimiter=',', encoding="utf-8-sig")
-graph_data_edges = np.loadtxt('data/reuse/edges.csv', dtype='str', delimiter=',', encoding="utf-8-sig")
+graph_data_nodes = np.loadtxt('data/reuse/nodes.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
+graph_data_edges = np.loadtxt('data/reuse/edges.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
 
 for node in graph_data_nodes:
         G.add_node(node[4],pos=(float(node[0]), float(node[1])))
@@ -48,9 +48,9 @@ except nx.NetworkXError:
     print('Error drawing metro nodes')
 
 # Draw Walk Nodes
-#try: nx.draw_networkx_nodes(G, pos, nodelist=walkNodes, node_size=25, node_color='tab:green', alpha=0.9)
-#except nx.NetworkXError:
-#    print('Error drawing walk nodes')
+try: nx.draw_networkx_nodes(G, pos, nodelist=walkNodes, node_size=25, node_color='tab:green', alpha=0.9)
+except nx.NetworkXError:
+    print('Error drawing walk nodes')
 
 # Draw Bus Edges
 try: nx.draw_networkx_edges(G, pos, edgelist=busEdges, edge_color='tab:blue')
@@ -63,9 +63,9 @@ except nx.NetworkXError:
     print('Error drawing metro edges')
 
 # Draw Walk Edges
-#try: nx.draw_networkx_edges(G, pos, edgelist=walkEdges, edge_color='tab:green')
-#except nx.NetworkXError:
-#    print('Error drawing walk edges')
+try: nx.draw_networkx_edges(G, pos, edgelist=walkEdges, edge_color='tab:green')
+except nx.NetworkXError:
+    print('Error drawing walk edges')
 
 # Draw Labels
 #nx.draw_networkx_labels(G, pos, font_size=10)

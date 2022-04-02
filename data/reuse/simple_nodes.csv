@@ -1,3 +1,4 @@
+Latitude,Longitude,Name,Zone,Code,Referenced,IsStation
 41.14954216,-8.610023615,AV.ALIADOS,PRT1,bus_1AL2,true,true
 41.1517987,-8.609555607,TRINDADE,PRT1,bus_TRD1,true,true
 41.15105996,-8.610808344,TRINDADE,PRT1,bus_TRD6,true,true
