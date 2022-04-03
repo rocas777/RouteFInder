@@ -14,7 +14,8 @@ func main() {
 	buildTestGraph(g)
 	
 	distance.DijkstraForNode(g, g.NodesMap()["node0"])
-	
+	distance.FloydWarshall(g)
+
 	for _, n := range g.NodesMap() {
 		fmt.Println(n.Id(), "with dist", n.Distance())
 	}
