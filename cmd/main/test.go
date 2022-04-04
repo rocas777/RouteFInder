@@ -12,13 +12,14 @@ func main() {
 
 	g := graph.NewGraph()
 	buildTestGraph(g)
-	
+
 	distance.DijkstraForNode(g, g.NodesMap()["node0"])
-	distance.FloydWarshall(g)
 
 	for _, n := range g.NodesMap() {
 		fmt.Println(n.Id(), "with dist", n.Distance())
 	}
+
+	fmt.Println(distance.FloydWarshall(g))
 }
 
 func buildTestGraph(g *graph.Graph) {
@@ -38,7 +39,7 @@ func buildTestGraph(g *graph.Graph) {
 	node13 := graph.NewNormalNode(3, 1, "node3,1", "zone0", "node13")
 	node14 := graph.NewNormalNode(3, 2, "node3,2", "zone0", "node14")
 	node15 := graph.NewNormalNode(3, 3, "node3,3", "zone0", "node15")
-	
+
 	node0.AddDestination(node1, 1)
 	node0.AddDestination(node4, 1)
 	node1.AddDestination(node0, 1)
@@ -87,7 +88,7 @@ func buildTestGraph(g *graph.Graph) {
 	node14.AddDestination(node15, 2)
 	node15.AddDestination(node11, 3)
 	node15.AddDestination(node14, 2)
-	
+
 	g.AddNode(node0)
 	g.AddNode(node1)
 	g.AddNode(node2)
