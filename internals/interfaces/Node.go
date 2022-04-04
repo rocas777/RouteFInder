@@ -27,13 +27,13 @@ type Node interface {
 
 	IsStation() bool
 	SetIsStation(isStation bool)
-	
+
 	Visited() bool
 	SetVisited(visited bool)
-	
+
 	Distance() float64
 	SetDistance(distance float64)
-	
+
 	Previous() string
 	SetPrevious(previous string)
 

@@ -23,7 +23,7 @@ type Graph struct {
 func NewGraph() *Graph {
 	return &Graph{nodesMap: make(map[string]interfaces.Node)}
 }
-	
+
 func (g *Graph) Nodes() []interfaces.Node {
 	return g.nodes
 }
@@ -188,6 +188,9 @@ func (g *Graph) GetCoordsBox() (float64, float64, float64, float64) {
 func (g *Graph) RemoveNodes(nodes []interfaces.Node) {
 	for _, n := range nodes {
 		delete(g.nodesMap, n.Id())
+		delete(g.busableNodes, n.Id())
+		delete(g.metroableNodes, n.Id())
+		delete(g.walkableNodes, n.Id())
 	}
 	g.nodes = make([]interfaces.Node, len(g.nodesMap))
 	counter := 0

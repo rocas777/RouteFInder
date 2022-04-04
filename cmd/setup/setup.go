@@ -11,6 +11,11 @@ import (
 func main() {
 	g := graph.Graph{}
 	g.Init()
+
+	lat1, lat2, lon1, lon2 := g.GetCoordsBox()
+
+	filtering.Crop(&g, lat1+((lat2-lat1)/2), lon1+((lon2-lon1)/2), lat2, lon2)
+
 	cleanGraph(&g)
 
 	tree := kdtree.NewKDTree(&g)
