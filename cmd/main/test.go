@@ -2,6 +2,7 @@ package main
 
 import (
 	"edaa/internals/algorithms/distance"
+	"edaa/internals/algorithms/path"
 	"edaa/internals/graph"
 	"edaa/internals/utils"
 	"fmt"
@@ -20,6 +21,7 @@ func main() {
 	}
 
 	fmt.Println(distance.FloydWarshall(g))
+	fmt.Println(distance.a_star(g, node0, node15))
 }
 
 func buildTestGraph(g *graph.Graph) {

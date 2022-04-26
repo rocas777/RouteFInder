@@ -1,6 +1,0 @@
-package go
-
-import (
-	"edaa/internals/graph"
-	"math"
-)
