@@ -31,10 +31,10 @@ func main() {
 		return utils.GetDistanceBetweenNodes(from, to) / (33 / 3.6)
 	})
 
-	//startNode := g.Nodes()[7999]
-	//endNode := g.Nodes()[157000]
-	startNode := g.NodesMap()["metro_27"]
-	endNode := g.NodesMap()["metro_76"]
+	startNode := g.Nodes()[7999]
+	endNode := g.Nodes()[157000]
+	//startNode := g.NodesMap()["metro_27"]
+	//endNode := g.NodesMap()["metro_76"]
 
 	path, pathTime, explored := as.Path(startNode, endNode)
 

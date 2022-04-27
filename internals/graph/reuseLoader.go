@@ -25,6 +25,7 @@ type tempReuseEdge struct {
 }
 
 func InitReuse(g interfaces.Graph) {
+	os.Remove("data/reuse/path_edges.csv")
 	g.SetNodesMap(make(map[string]interfaces.Node))
 	g.SetWalkableNodes(make(map[string]interfaces.Node))
 	g.SetBusableNodes(make(map[string]interfaces.Node))

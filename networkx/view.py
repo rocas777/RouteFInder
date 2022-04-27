@@ -6,7 +6,11 @@ G = nx.MultiGraph()
 
 graph_data_nodes = np.loadtxt('data/reuse/nodes.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
 graph_data_edges = np.loadtxt('data/reuse/edges.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
-path_edges = np.loadtxt('data/reuse/path_edges.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
+path_edges = []
+try:
+	path_edges = np.loadtxt('data/reuse/path_edges.csv', dtype='str', delimiter=',', encoding="utf-8-sig", skiprows=1)
+except:
+	pass
 
 for node in graph_data_nodes:
         G.add_node(node[4],pos=(float(node[0]), float(node[1])))
@@ -85,7 +89,7 @@ try: nx.draw_networkx_edges(G, pos, edgelist=pathEdges, edge_color='black', widt
 except nx.NetworkXError:
     print('Error drawing path edges')
     
-# Draw Labels
+# Draw Labels	
 #nx.draw_networkx_labels(G, pos, font_size=10)
 
 def maximize():
