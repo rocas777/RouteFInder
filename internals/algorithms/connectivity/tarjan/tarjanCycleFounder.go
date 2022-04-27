@@ -22,9 +22,13 @@ var disconnectedComponents [][]interfaces.SCC
 
 // prints the size of each StronglyConnectedComponentsSizes
 func PrintStronglyConnectedComponentsSizes(number int64, disconnectedComponents [][]interfaces.SCC) {
+	println()
+	println("Stongly connected components:", number)
 	for _, c := range disconnectedComponents {
 		for _, component := range c {
-			println(component.Nodes()[0].Id(), len(component.Nodes()))
+			println("\tFirst node on the component:", component.Nodes()[0].Id())
+			println("\tComponent size:", len(component.Nodes()))
+			println("")
 		}
 	}
 }

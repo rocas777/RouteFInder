@@ -31,4 +31,7 @@ type Graph interface {
 	GetNode(id string) (Node, error)
 	AddNode(node Node)
 	RemoveNodes(nodes []Node)
+
+	Init()
+	GetEdges() []Edge
 }

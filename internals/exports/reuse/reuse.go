@@ -1,7 +1,6 @@
 package reuse
 
 import (
-	"edaa/internals/graph"
 	"edaa/internals/interfaces"
 	"github.com/gocarina/gocsv"
 	"os"
@@ -29,14 +28,14 @@ func newExportEdge(edge interfaces.Edge) *exportEdge {
 	return &exportEdge{From: edge.From().Id(), To: edge.To().Id(), Weight: edge.Weight()}
 }
 
-func ExportNodes(g *graph.Graph, filePath string) {
+func ExportNodes(g interfaces.Graph, filePath string) {
 	outNodes := make([]*exportNode, len(g.Nodes()))
 	for i, node := range g.Nodes() {
 		outNodes[i] = newExportNode(node)
 	}
 	export(outNodes, filePath)
 }
-func ExportEdges(g *graph.Graph, filePath string) {
+func ExportEdges(g interfaces.Graph, filePath string) {
 	edges := g.GetEdges()
 	var outEdges = make([]*exportEdge, len(edges))
 	for i, edge := range edges {

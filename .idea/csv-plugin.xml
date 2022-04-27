@@ -304,6 +304,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/bus/lines/line_507_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_507_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/bus/lines/line_508_0.csv">
           <value>
             <Attribute>
@@ -333,6 +347,20 @@
           </value>
         </entry>
         <entry key="/data/bus/lines/line_600_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_601_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_601_1.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

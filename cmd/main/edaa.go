@@ -1,9 +1,16 @@
 package main
 
 import (
+	"edaa/internals/exports/reuse"
+	"edaa/internals/graph"
+	"errors"
+	"log"
+	"os/exec"
+
 	//"edaa/internals/algorithms/path/astar"
-	//"edaa/internals/graph"
+	//"edaa/internals/g"
 	"edaa/internals/interfaces"
+	"edaa/internals/menuHelper"
 	"edaa/internals/types"
 	//"edaa/internals/utils"
 	//"time"
@@ -17,74 +24,70 @@ type tempEdge struct {
 	edgeType types.EdgeType
 }
 
-func menu() {
+var g interfaces.Graph
+
+func menu() bool {
+	println("")
 	println("Select one of the following")
 	println("1 - Setup")
-	println("2 - Connectivity Analysis")
-	println("3 - Find Path")
-	println("4 - See Map")
-	println("5 - Exit")
+	println("2 - Load")
+	println("3 - Connectivity Analysis")
+	println("4 - Find Path")
+	println("5 - See Map")
+	println("6 - Load Raw")
+	println("7 - Export")
+	println("8 - Exit")
 	reader := bufio.NewReader(os.Stdin)
 	opt, _ := reader.ReadString('\n')
 	opt = strings.TrimSpace(opt)
+
 	switch opt {
 	case "1":
-		println(opt)
-		menu()
+		g = menuHelper.Setup()
 	case "2":
-		println(opt)
-		menu()
+		if _, err := os.Stat("data/reuse/edges.csv"); err == nil {
+			g = &graph.Graph{}
+			graph.InitReuse(g)
+		} else if errors.Is(err, os.ErrNotExist) {
+			println("Could not load, file does not exist")
+		}
 	case "3":
-		println(opt)
-		menu()
+		if g == nil {
+			println("Must setup or load graph first!!!!")
+		} else {
+			menuHelper.Connectivity(g)
+		}
 	case "4":
-		println(opt)
-		menu()
+		if g == nil {
+			println("Must setup or load graph first!!!!")
+		} else {
+			if g == nil {
+				println("Must setup or load graph first!!!!")
+			} else {
+				menuHelper.PathFinder(g)
+			}
+		}
 	case "5":
+		cmd := exec.Command("python3", "networkx/view.py")
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		log.Println(cmd.Run())
+	case "6":
+		g = &graph.Graph{}
+		println("")
+		println("Initiating graph...")
+		g.Init()
+	case "7":
+		reuse.ExportEdges(g, "data/reuse/edges.csv")
+		reuse.ExportNodes(g, "data/reuse/nodes.csv")
+	case "8":
 		println("Cya")
-	default:
-		menu()
+		return false
 	}
+	return true
 }
 
 func main() {
-	/*
-	initTime := time.Now()
-
-	g := graph.Graph{}
-	graph.InitReuse(&g)
-
-	*/
-
-	/*disconnectedComponents, number := tarjan.TarjanGetStronglyConnectedComponents(&g)
-	tarjan.PrintStronglyConnectedComponentsSizes(number, disconnectedComponents)*/
-
-	/*
-
-	println("Load time:", time.Since(initTime).Milliseconds())
-	initTime = time.Now()
-	*/
-
-	menu()
-
-	/*
-
-	as := astar.NewAstar(&g, func(from interfaces.Node, to interfaces.Node) float64 {
-		return 0
-		return utils.GetDistanceBetweenNodes(from, to) / (33 / 3.6)
-	})
-
-	startNode := g.Nodes()[7999]
-	endNode := g.Nodes()[157000]
-	//startNode := g.NodesMap()["metro_27"]
-	//endNode := g.NodesMap()["metro_76"]
-
-	path, pathTime, explored := as.Path(startNode, endNode)
-
-	astar.PreetyDisplay(path, pathTime, explored, startNode, endNode)
-	astar.ExportEdges(path)
-
-	println("Find time:", time.Since(initTime).Milliseconds())
-
-	*/
+	for menu() {
+	}
 }
