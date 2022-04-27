@@ -1,6 +1,9 @@
 package graph
 
-import "edaa/internals/interfaces"
+import (
+	"edaa/internals/interfaces"
+	"edaa/internals/types"
+)
 
 type Node struct {
 	outEdges   []interfaces.Edge
@@ -12,9 +15,6 @@ type Node struct {
 	id         string
 	referenced bool
 	isStation  bool
-	visited    bool
-	distance   float64
-	previous   string
 }
 
 func (n *Node) OutEdges() []interfaces.Edge {
@@ -88,31 +88,6 @@ func (n *Node) IsStation() bool {
 func (n *Node) SetIsStation(isStation bool) {
 	n.isStation = isStation
 }
-
-func (n *Node) Visited() bool {
-	return n.visited
-}
-
-func (n *Node) SetVisited(visited bool) {
-	n.visited = visited
-}
-
-func (n *Node) Distance() float64 {
-	return n.distance
-}
-
-func (n *Node) SetDistance(distance float64) {
-	n.distance = distance
-}
-
-func (n *Node) Previous() string {
-	return n.previous
-}
-
-func (n *Node) SetPrevious(previous string) {
-	n.previous = previous
-}
-
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
 	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, id: code, isStation: true, referenced: false}
 }
@@ -122,10 +97,24 @@ func NewNormalNode(latitude float64, longitude float64, name string, zone string
 }
 
 func (n *Node) AddDestination(destination interfaces.Node, weight float64) {
+	edgeType := types.Road
+
+	if n.Id()[0] == destination.Id()[0] {
+		if n.Id()[0] == 'm' {
+			edgeType = types.Metro
+		} else if n.Id()[0] == 'b' {
+			edgeType = types.Bus
+		}
+	}
+
+	if weight == 0 {
+		println(n.id, destination.Id())
+		panic("")
+	}
 	destination.SetReferenced(true)
 	n.referenced = true
-	n.outEdges = append(n.outEdges, NewEdge(n, destination, weight))
-	destination.SetInEdges(append(destination.InEdges(), NewEdge(n, destination, weight)))
+	n.outEdges = append(n.outEdges, NewEdge(n, destination, weight, edgeType))
+	destination.SetInEdges(append(destination.InEdges(), NewEdge(n, destination, weight, edgeType)))
 }
 
 func (n *Node) RemoveOutEdge(node interfaces.Node) {

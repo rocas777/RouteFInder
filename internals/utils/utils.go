@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"edaa/internals/interfaces"
 	"fmt"
 	"github.com/umahmood/haversine"
 	"runtime"
@@ -11,6 +12,13 @@ import (
 func GetDistance(lat1, lon1, lat2, lon2 float64) float64 {
 	spot1 := haversine.Coord{Lat: lat1, Lon: lon1}
 	spot2 := haversine.Coord{Lat: lat2, Lon: lon2}
+	_, km := haversine.Distance(spot1, spot2)
+	return km * 1000
+}
+
+func GetDistanceBetweenNodes(n1, n2 interfaces.Node) float64 {
+	spot1 := haversine.Coord{Lat: n1.Latitude(), Lon: n1.Longitude()}
+	spot2 := haversine.Coord{Lat: n2.Latitude(), Lon: n2.Longitude()}
 	_, km := haversine.Distance(spot1, spot2)
 	return km * 1000
 }
@@ -39,13 +47,13 @@ func bToMb(b uint64) uint64 {
 }
 
 func RemoveString(stringList []string, element string) []string {
-	var index int = containsString(stringList, element);
-	
+	var index int = containsString(stringList, element)
+
 	if index != -1 {
-		stringList[index] = stringList[len(stringList)-1];
+		stringList[index] = stringList[len(stringList)-1]
 		return stringList[:len(stringList)-1]
 	}
-	
+
 	return stringList
 }
 

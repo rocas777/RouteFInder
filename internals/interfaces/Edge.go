@@ -1,5 +1,7 @@
 package interfaces
 
+import "edaa/internals/types"
+
 type Edge interface {
 	From() Node
 	SetFrom(from Node)
@@ -9,4 +11,6 @@ type Edge interface {
 
 	Weight() float64
 	SetWeight(weight float64)
+
+	EdgeType() types.EdgeType
 }

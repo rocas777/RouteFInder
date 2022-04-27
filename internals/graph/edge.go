@@ -1,11 +1,19 @@
 package graph
 
-import "edaa/internals/interfaces"
+import (
+	"edaa/internals/interfaces"
+	"edaa/internals/types"
+)
 
 type Edge struct {
-	from   interfaces.Node
-	to     interfaces.Node
-	weight float64
+	from     interfaces.Node
+	to       interfaces.Node
+	weight   float64
+	edgeType types.EdgeType
+}
+
+func (e *Edge) EdgeType() types.EdgeType {
+	return e.edgeType
 }
 
 func (e *Edge) From() interfaces.Node {
@@ -32,6 +40,6 @@ func (e *Edge) SetWeight(weight float64) {
 	e.weight = weight
 }
 
-func NewEdge(from interfaces.Node, to interfaces.Node, weight float64) *Edge {
-	return &Edge{from: from, to: to, weight: weight}
+func NewEdge(from interfaces.Node, to interfaces.Node, weight float64, edgeType types.EdgeType) *Edge {
+	return &Edge{from: from, to: to, weight: weight, edgeType: edgeType}
 }

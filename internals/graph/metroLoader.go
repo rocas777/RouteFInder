@@ -2,6 +2,7 @@ package graph
 
 import (
 	"edaa/internals/interfaces"
+	"edaa/internals/utils"
 	"github.com/gocarina/gocsv"
 	"os"
 	"time"
@@ -74,6 +75,7 @@ func loadMetroEdges(helperMap map[string]interfaces.Node) {
 
 	var lastNode interfaces.Node
 	var lastStopTime *tempStopTimeStruct
+	fastestSpeed := 0.0
 	for _, line := range lines {
 		lastNode = nil
 		lastStopTime = nil
@@ -81,16 +83,28 @@ func loadMetroEdges(helperMap map[string]interfaces.Node) {
 			currentNode := helperMap[stopTime.StopID]
 			currentStopTime := stopTime
 			if lastNode != nil && lastStopTime != nil {
-				lastTime, _ := time.Parse("15:04:05", lastStopTime.DepartureTime)
-				currentTime, _ := time.Parse("15:04:05", currentStopTime.DepartureTime)
+				lastTime, err1 := time.Parse("15:04:05", lastStopTime.DepartureTime)
+				currentTime, err2 := time.Parse("15:04:05", currentStopTime.DepartureTime)
+
+				if err1 != nil || err2 != nil {
+					continue
+				}
+
+				dist := utils.GetDistanceBetweenNodes(lastNode, currentNode)
 
 				seconds := currentTime.Sub(lastTime)
+
+				if dist/seconds.Seconds() > fastestSpeed && seconds.Seconds() > 0.0 {
+					fastestSpeed = dist / seconds.Seconds()
+				}
+
 				lastNode.AddDestination(currentNode, seconds.Seconds())
 			}
 			lastNode = currentNode
 			lastStopTime = currentStopTime
 		}
 	}
+	//panic(fastestSpeed)
 }
 
 func InitMetro(g interfaces.Graph) {

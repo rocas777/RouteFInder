@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+const walkSpeed = 1.0
+
 type osm struct {
 	XMLName xml.Name  `xml:"osm"`
 	Nodes   []osmNode `xml:"node"`
@@ -86,7 +88,7 @@ func InitRoads(g interfaces.Graph) {
 			if lastNode == nil {
 				lastNode = currentNode
 			} else {
-				dist := utils.GetDistance(lastNode.Latitude(), lastNode.Longitude(), currentNode.Latitude(), currentNode.Longitude())
+				dist := utils.GetDistance(lastNode.Latitude(), lastNode.Longitude(), currentNode.Latitude(), currentNode.Longitude()) / walkSpeed
 				lastNode.AddDestination(currentNode, dist)
 				if isTwoWay {
 					currentNode.AddDestination(lastNode, dist)

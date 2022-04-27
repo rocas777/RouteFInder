@@ -12,9 +12,8 @@ func main() {
 	g := graph.Graph{}
 	g.Init()
 
-	lat1, lat2, lon1, lon2 := g.GetCoordsBox()
-
-	filtering.Crop(&g, lat1+((lat2-lat1)/2), lon1+((lon2-lon1)/2), lat2, lon2)
+	//lat1, lat2, lon1, lon2 := g.GetCoordsBox()
+	//filtering.Crop(&g, lat1+((lat2-lat1)/2), lon1+((lon2-lon1)/2), lat2, lon2)
 
 	cleanGraph(&g)
 
@@ -24,7 +23,7 @@ func main() {
 	disconnectedComponents, number := tarjan.TarjanGetStronglyConnectedComponents(&g)
 	tarjan.PrintStronglyConnectedComponentsSizes(number, disconnectedComponents)
 
-	filtering.Condensate(&g)
+	//filtering.Condensate(&g)
 
 	reuse.ExportEdges(&g, "data/reuse/edges.csv")
 	reuse.ExportNodes(&g, "data/reuse/nodes.csv")
