@@ -105,7 +105,7 @@ func NewAstar(graph interfaces.Graph, H func(from interfaces.Node, to interfaces
 
 func (a *astar) fetchPath(last *astarNode) ([]interfaces.Edge, float64) {
 	tempPath := make([]interfaces.Edge, 0)
-	exploring := last.last
+	exploring := last
 	for exploring.last != nil {
 		tE := astarEdge{
 			from:     exploring.last.realNode,

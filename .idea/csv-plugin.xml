@@ -143,6 +143,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/bus/lines/line_204_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_204_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/bus/lines/line_207_0.csv">
           <value>
             <Attribute>
@@ -151,6 +165,20 @@
           </value>
         </entry>
         <entry key="/data/bus/lines/line_207_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_300_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_301_0.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -227,6 +255,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/bus/lines/line_503_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_503_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/bus/lines/line_504_0.csv">
           <value>
             <Attribute>
@@ -242,6 +284,34 @@
           </value>
         </entry>
         <entry key="/data/bus/lines/line_505_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_506_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_506_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_508_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_508_1.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -423,6 +493,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/bus/lines/line_7M_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/data/bus/lines/line_7M_1.csv">
           <value>
             <Attribute>
@@ -438,6 +515,13 @@
           </value>
         </entry>
         <entry key="/data/bus/lines/line_801_1.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_803_0.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -494,6 +578,13 @@
           </value>
         </entry>
         <entry key="/data/bus/lines/line_902_0.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/bus/lines/line_902_1.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
@@ -613,6 +704,13 @@
           </value>
         </entry>
         <entry key="/data/reuse/nodes.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/reuse/path_edges.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

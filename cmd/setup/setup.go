@@ -25,6 +25,8 @@ func main() {
 
 	//filtering.Condensate(&g)
 
+	filtering.RemoveBrokenEdges(&g)
+
 	reuse.ExportEdges(&g, "data/reuse/edges.csv")
 	reuse.ExportNodes(&g, "data/reuse/nodes.csv")
 }

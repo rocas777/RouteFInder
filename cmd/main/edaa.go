@@ -39,6 +39,7 @@ func main() {
 	path, pathTime, explored := as.Path(startNode, endNode)
 
 	astar.PreetyDisplay(path, pathTime, explored, startNode, endNode)
+	astar.ExportEdges(path)
 
 	println("Find time:", time.Since(initTime).Milliseconds())
 
