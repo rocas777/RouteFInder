@@ -1,6 +1,7 @@
 package main
 
 import (
+	kdtree2 "edaa/internals/dataStructures/kdtree"
 	"edaa/internals/exports/reuse"
 	"edaa/internals/graph"
 	"errors"
@@ -11,7 +12,6 @@ import (
 	//"edaa/internals/g"
 	"edaa/internals/interfaces"
 	"edaa/internals/menuHelper"
-	"edaa/internals/types"
 	//"edaa/internals/utils"
 	//"time"
 	"bufio"
@@ -19,12 +19,8 @@ import (
 	"strings"
 )
 
-type tempEdge struct {
-	node     interfaces.Node
-	edgeType types.EdgeType
-}
-
 var g interfaces.Graph
+var kdtree *kdtree2.KDTree
 
 func menu() bool {
 	println("")
@@ -43,6 +39,7 @@ func menu() bool {
 
 	switch opt {
 	case "1":
+		g = &graph.Graph{}
 		g = menuHelper.Setup()
 	case "2":
 		if _, err := os.Stat("data/reuse/edges.csv"); err == nil {
@@ -64,14 +61,20 @@ func menu() bool {
 			if g == nil {
 				println("Must setup or load graph first!!!!")
 			} else {
-				menuHelper.PathFinder(g)
+				if kdtree == nil {
+					kdtree = kdtree2.NewKDTree(g)
+				}
+				menuHelper.PathFinder(g, kdtree)
 			}
 		}
 	case "5":
-		cmd := exec.Command("python3", "networkx/view.py")
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		log.Println(cmd.Run())
+		go func() {
+			println("Loading... be patient")
+			cmd := exec.Command("python3", "networkx/view.py")
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			log.Println(cmd.Run())
+		}()
 	case "6":
 		g = &graph.Graph{}
 		println("")

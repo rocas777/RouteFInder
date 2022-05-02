@@ -1,7 +1,6 @@
 package kdtree
 
 import (
-	"edaa/internals/graph"
 	"edaa/internals/interfaces"
 	"edaa/internals/utils"
 	"math"
@@ -31,7 +30,7 @@ func NewNode(leftNode *Node, rightNode *Node, currentNode interfaces.Node) *Node
 	return &Node{leftNode: leftNode, rightNode: rightNode, currentNode: currentNode}
 }
 
-func NewKDTree(g *graph.Graph) *KDTree {
+func NewKDTree(g interfaces.Graph) *KDTree {
 	kd := &KDTree{}
 	walkSlice := make([]interfaces.Node, len(g.WalkableNodes()))
 	i := 0
