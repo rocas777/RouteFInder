@@ -3,8 +3,9 @@ package astar
 import (
 	"edaa/internals/interfaces"
 	"edaa/internals/types"
-	fibHeap "github.com/starwander/GoFibonacciHeap"
 	"math"
+
+	fibHeap "github.com/starwander/GoFibonacciHeap"
 )
 
 type astarNode struct {

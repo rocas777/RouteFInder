@@ -12,6 +12,7 @@ import (
 	//"edaa/internals/g"
 	"edaa/internals/interfaces"
 	"edaa/internals/menuHelper"
+
 	//"edaa/internals/utils"
 	//"time"
 	"bufio"
@@ -29,10 +30,11 @@ func menu() bool {
 	println("2 - Load")
 	println("3 - Connectivity Analysis")
 	println("4 - Find Path")
-	println("5 - See Map")
-	println("6 - Load Raw")
-	println("7 - Export")
-	println("8 - Exit")
+	println("5 - Find Path Genetics")
+	println("6 - See Map")
+	println("7 - Load Raw")
+	println("8 - Export")
+	println("9 - Exit")
 	reader := bufio.NewReader(os.Stdin)
 	opt, _ := reader.ReadString('\n')
 	opt = strings.TrimSpace(opt)
@@ -68,6 +70,19 @@ func menu() bool {
 			}
 		}
 	case "5":
+		if g == nil {
+			println("Must setup or load graph first!!!!")
+		} else {
+			if g == nil {
+				println("Must setup or load graph first!!!!")
+			} else {
+				if kdtree == nil {
+					kdtree = kdtree2.NewKDTree(g)
+				}
+				menuHelper.PathFinderGenetics(g, kdtree)
+			}
+		}
+	case "6":
 		go func() {
 			println("Loading... be patient")
 			cmd := exec.Command("python3", "networkx/view.py")
@@ -75,15 +90,15 @@ func menu() bool {
 			cmd.Stderr = os.Stderr
 			log.Println(cmd.Run())
 		}()
-	case "6":
+	case "7":
 		g = &graph.Graph{}
 		println("")
 		println("Initiating graph...")
 		g.Init()
-	case "7":
+	case "8":
 		reuse.ExportEdges(g, "data/reuse/edges.csv")
 		reuse.ExportNodes(g, "data/reuse/nodes.csv")
-	case "8":
+	case "9":
 		println("Cya")
 		return false
 	}
