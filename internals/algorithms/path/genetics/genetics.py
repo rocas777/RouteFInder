@@ -11,7 +11,6 @@ def generate(n):
 	ep = sum(p)
 	minW = int(0.2*ep)
 	maxW = int(0.6*ep)
-
 	for i in range(n):
 		d.append(random.randint(minW, maxW))
 	return p,w,d
@@ -26,9 +25,9 @@ def randomPath(n):
     return seq
 
 
-n = 50
+n=10
 pathdetail=[]
-path = []
+path =[]
 
 for i in range(n):
     path.append(i+1)
@@ -37,7 +36,7 @@ path=randomPath(n)
 
 with open("path_genetics.csv", "w") as new_file:
     csv_writer = csv.writer(new_file, delimiter=' ')
-    csv_writer.writerow(['Path', 'Nodes', 'Distance'])
+    csv_writer.writerow(['Node', 'Start', 'End', 'Distance'])
     for i in range(1, n + 1):
         csv_writer.writerow([i, pathdetail[i-1][0],pathdetail[i-1][1], pathdetail[i-1][2]])
 
@@ -103,16 +102,16 @@ def optimization(seq_arg):
             while min_i == min_j:
                 min_i = random.randint(0, len(seq_arg) - 1)
             xp = insertion(seq_arg, min_i,min_j)
-            cost_xp = cost(xp)
-            cost_min_xseconde = cost(insertion(xp,0,2))
+            cout_xp = cost(xp)
+            cout_min_xseconde = cost(insertion(xp,0,2))
             for k in range(len(xp)):
                 for j in range(k+1,len(xp)):
                     xseconde = insertion(xp, k, j)
-                    cost_xsec = cost(xseconde)
-                    if cost(xseconde) < cost_min_xseconde:
+                    cout_xsec = cost(xseconde)
+                    if cost(xseconde) < cout_min_xseconde:
                         xseconde_min = xseconde
-                        cost_min_xseconde = cost_xsec
-            if cost_min_xseconde < cost_xp:
+                        cout_min_xseconde = cout_xsec
+            if cout_min_xseconde < cout_xp:
                 xp = xseconde_min
                 i=0
                 seq_arg = xseconde_min
@@ -121,26 +120,31 @@ def optimization(seq_arg):
                 i=2
         if i == 2:
             xp = left_pivot(seq_arg, random.randint(0,len(seq_arg)-1))
-            cost_xp = cost(xp)
-            cost_min_xseconde = cost(left_pivot(xp,2))
+            cout_xp = cost(xp)
+            cout_min_xseconde = cost(left_pivot(xp,2))
             for k in range(2,len(seq_arg)):
                 xseconde = left_pivot(xp, k)
-                cost_xsec = cost(xseconde)
-                if cost(xseconde) < cost_min_xseconde:
+                cout_xsec = cost(xseconde)
+                if cost(xseconde) < cout_min_xseconde:
                     xseconde_min = xseconde
-                    cost_min_xseconde = cost_xsec
-            if cost_min_xseconde < cost_xp:
+                    cout_min_xseconde = cout_xsec
+            if cout_min_xseconde < cout_xp:
                 xp = xseconde_min
                 seq_arg = xseconde_min
-            else:
-                seq_arg = randomPath(n)
             i = 0
         if cost_min_xseconde < cost_end:
             cost_end = cost_min_xseconde
             seq_end = xseconde_min
     return seq_end, cost_end
 
-min_seq, min_cost = optimization(path)
-result=f"Path: {min_seq} \nDistance: {min_cost}"
+
+new_path = []
+for i in range(len(path)-1):
+    new_path.append(path[i])
+min_seq, min_cost = optimization(new_path)
+min_seq.append(path[n-1])
+min_seq.insert(0, path[0])
+
+result=f"Path: {path}\nDistance: {cost(path)}\nNew Path: {min_seq} \nNew Distance: {min_cost}"
 with open("results_genetics.csv", "w") as new_file:
     new_file.write(result)
