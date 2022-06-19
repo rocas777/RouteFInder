@@ -94,13 +94,14 @@ func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) int {
 	if depth < 17 {
 		q.nodes = nil
 		adder := sortInQuad(g, q.nw, depth+1, init)
-		fmt.Println(adder)
+		//fmt.Println(adder)
 		adder += sortInQuad(g, q.ne, depth+1, init+adder)
-		fmt.Println(adder)
+		//fmt.Println(adder)
 		adder += sortInQuad(g, q.sw, depth+1, init+adder)
-		fmt.Println(adder)
+		//fmt.Println(adder)
 		adder += sortInQuad(g, q.se, depth+1, init+adder)
-		fmt.Println(adder)
+		//fmt.Println(adder)
+		//println()
 		q.start = init
 		q.end = init + adder
 		return adder
