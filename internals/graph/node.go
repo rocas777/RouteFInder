@@ -15,6 +15,8 @@ type Node struct {
 	id         string
 	referenced bool
 	isStation  bool
+	toLandmarks []float64
+	fromLandmarks []float64
 }
 
 func (n *Node) OutEdges() []interfaces.Edge {
@@ -88,6 +90,7 @@ func (n *Node) IsStation() bool {
 func (n *Node) SetIsStation(isStation bool) {
 	n.isStation = isStation
 }
+
 func NewStationNode(latitude float64, longitude float64, name string, zone string, code string) *Node {
 	return &Node{latitude: latitude, longitude: longitude, name: name, zone: zone, id: code, isStation: true, referenced: false}
 }
@@ -137,4 +140,12 @@ func (n *Node) RemoveInEdge(node interfaces.Node) {
 func (n *Node) RemoveConnections(nodeToRemove interfaces.Node) {
 	n.RemoveInEdge(nodeToRemove)
 	n.RemoveOutEdge(nodeToRemove)
+}
+
+func (n *Node) AddToLandmark(landmark int, distance float64) () {
+	n.toLandmarks[landmark] = distance
+}
+
+func (n *Node) AddFromLandmark(landmark int, distance float64) () {
+	n.fromLandmarks[landmark] = distance
 }
