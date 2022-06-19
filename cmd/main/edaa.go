@@ -101,6 +101,12 @@ func menu() bool {
 	case "9":
 		println("Cya")
 		return false
+	case "10":
+		if g == nil {
+			println("Must setup or load graph first!!!!")
+		} else {
+			menuHelper.Landmarks(g)
+		}
 	}
 	return true
 }

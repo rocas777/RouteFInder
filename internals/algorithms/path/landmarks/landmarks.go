@@ -1,9 +1,9 @@
 package landmarks
 
 import (
-	"edaa/internals/algorithms/path/astar"
 	"edaa/internals/interfaces"
 	"edaa/internals/types"
+	"fmt"
 	"math"
 
 	fibHeap "github.com/starwander/GoFibonacciHeap"
@@ -35,7 +35,35 @@ type dijkstra struct {
 	graph interfaces.Graph
 }
 
+func (d* dijkstra) ProcessLandmarks () {
+	landmarks := initLandmarks(d.graph.NodesMap())
+	for i, n := range landmarks {
+		d.PreprocessLandmark(i, n)
+	}
+	fmt.Println(d.graph.Nodes()[0].GetFromLandmarks())
+}
+
+func initLandmarks(nodesMap map[string]interfaces.Node) ([]interfaces.Node) {
+	landmarks := []interfaces.Node{
+		nodesMap["walk_1227750946"],
+		nodesMap["walk_1319947243"],
+		nodesMap["walk_1419373987"],
+		nodesMap["walk_1417923344"],
+		nodesMap["walk_1438734394"],
+		nodesMap["walk_1440898396"],
+		nodesMap["walk_4438272432"],
+		nodesMap["walk_7554539118"],
+		nodesMap["walk_1562394871"],
+		nodesMap["walk_1390095467"],
+		nodesMap["walk_4580255471"],
+		nodesMap["walk_1164520592"],
+	}
+	
+	return landmarks
+}
+
 func (d *dijkstra) PreprocessLandmark(landmark int, source interfaces.Node) () {
+	fmt.Println("preprocessing landmark", landmark)
 	explored := make(map[string]interface{})
 	dijkstraNodes := make(map[string]*dijkstraNode)
 	
@@ -74,11 +102,6 @@ func (d *dijkstra) PreprocessLandmark(landmark int, source interfaces.Node) () {
 		
 		// update node with distance from landmark
 		currentRealNode.AddFromLandmark(landmark, currentDijkstraNode.accumulatedDist)
-		
-		// update node with distance to landmark
-		as := astar.NewAstar(d.graph, func(from interfaces.Node, to interfaces.Node) float64 {return 0})
-		_, weight, _ := as.Path(currentRealNode, source)
-		currentRealNode.AddToLandmark(landmark, weight)
 		
 		// update out nodes distances in heap
 		for _, edge := range currentRealNode.OutEdges() {

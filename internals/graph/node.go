@@ -15,8 +15,7 @@ type Node struct {
 	id         string
 	referenced bool
 	isStation  bool
-	toLandmarks []float64
-	fromLandmarks []float64
+	fromLandmarks [12]float64
 }
 
 func (n *Node) OutEdges() []interfaces.Edge {
@@ -142,10 +141,10 @@ func (n *Node) RemoveConnections(nodeToRemove interfaces.Node) {
 	n.RemoveOutEdge(nodeToRemove)
 }
 
-func (n *Node) AddToLandmark(landmark int, distance float64) () {
-	n.toLandmarks[landmark] = distance
-}
-
 func (n *Node) AddFromLandmark(landmark int, distance float64) () {
 	n.fromLandmarks[landmark] = distance
+}
+
+func (n *Node) GetFromLandmarks() [12]float64 {
+	return n.fromLandmarks
 }
