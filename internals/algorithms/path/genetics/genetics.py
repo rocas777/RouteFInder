@@ -98,7 +98,7 @@ def optimization(seq_arg):
                 i = 1
         if i == 1:
             min_i = random.randint(0, len(seq_arg) - 1)
-            min_j = random.randint(1, len(seq_arg) - 1)
+            min_j = random.randint(0, len(seq_arg) - 1)
             while min_i == min_j:
                 min_i = random.randint(0, len(seq_arg) - 1)
             xp = insertion(seq_arg, min_i,min_j)
