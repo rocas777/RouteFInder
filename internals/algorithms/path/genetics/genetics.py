@@ -1,15 +1,51 @@
 import time
 import random
+import csv
 
-path=['walk_1143317559', 'walk_1143317946', 'walk_1143316551', 'walk_2902711664']
-pathdetail=[['walk_1143317559','walk_1143317946',88.50696628450761],
-            ['walk_1143317946','walk_1143316551',20.93599453900186],
-            ['walk_1143316551','walk_2902711664',6.8670632025406295]]
+
+def generate(n):
+	p,w,d = [],[],[]
+	for i in range(n):
+		p.append(random.randint(1,100))
+		w.append(random.randint(1,10))
+	ep = sum(p)
+	minW = int(0.2*ep)
+	maxW = int(0.6*ep)
+
+	for i in range(n):
+		d.append(random.randint(minW, maxW))
+	return p,w,d
+
+
+def randomPath(n):
+    seq=[]
+    for i in range(n):
+        seq.append(random.randint(1,n));
+        while seq[i] in seq[0:i]:
+            seq[i]=random.randint(1,n);
+    return seq
+
+
+n = 50
+pathdetail=[]
+path = []
+
+for i in range(n):
+    path.append(i+1)
+    pathdetail.append([generate(n)[0][i], generate(n)[1][i], generate(n)[2][i]])
+path=randomPath(n)
+
+with open("path_genetics.csv", "w") as new_file:
+    csv_writer = csv.writer(new_file, delimiter=' ')
+    csv_writer.writerow(['Path', 'Nodes', 'Distance'])
+    for i in range(1, n + 1):
+        csv_writer.writerow([i, pathdetail[i-1][0],pathdetail[i-1][1], pathdetail[i-1][2]])
 
 def cost(seq):
     ct,ci = 0, 0
-    for i in range(len(pathdetail)):
-        ct += pathdetail[i][2]
+    for i in range(len(seq)):
+        ci += pathdetail[seq[i]-1][0]
+        ct += pathdetail[seq[i]-1][1] * max(0, ci - pathdetail[seq[i]-1][2])
     return ct
 
 
@@ -30,14 +66,12 @@ def left_pivot(l,i):
     l = l1+l2
     return l
 
-
-def optimisation(seq_arg):
+def optimization(seq_arg):
     i = 0
-    delais_desire = 0
-    timeout = time.time() + delais_desire
+    timeout = time.time()
     xp = []
-    cost_fin = 99999999999999999999999
-    seq_fin = []
+    cost_end = 99999999999999999999999
+    seq_end = []
     while True:
         if time.time() > timeout:
             break
@@ -98,13 +132,15 @@ def optimisation(seq_arg):
             if cost_min_xseconde < cost_xp:
                 xp = xseconde_min
                 seq_arg = xseconde_min
+            else:
+                seq_arg = randomPath(n)
             i = 0
-        if cost_min_xseconde < cost_fin:
-            cost_fin = cost_min_xseconde
-    return seq_fin, cost_fin
+        if cost_min_xseconde < cost_end:
+            cost_end = cost_min_xseconde
+            seq_end = xseconde_min
+    return seq_end, cost_end
 
-
-new_path, distance = optimisation(path)
-injection_resultat=f"Path: {path}\nOptimized Path: {new_path}\nDistance: [{distance}]"
+min_seq, min_cost = optimization(path)
+result=f"Path: {min_seq} \nDistance: {min_cost}"
 with open("results_genetics.csv", "w") as new_file:
-    new_file.write(injection_resultat)
+    new_file.write(result)
