@@ -3,9 +3,8 @@ package astar
 import (
 	"edaa/internals/interfaces"
 	"edaa/internals/types"
-	"math"
-
 	fibHeap "github.com/starwander/GoFibonacciHeap"
+	"math"
 )
 
 type astarNode struct {
@@ -38,17 +37,6 @@ type astar struct {
 func (a *astar) Path(source interfaces.Node, destination interfaces.Node) ([]interfaces.Edge, float64, int) {
 	explored := make(map[string]interface{})
 	astarNodes := make(map[string]*astarNode)
-	for _, n := range a.graph.Nodes() {
-		if n.Id() != source.Id() {
-			aN := &astarNode{
-				last:            nil,
-				accumulatedDist: math.Inf(1),
-				realNode:        n,
-			}
-			a.heap.Insert(aN, math.Inf(1))
-			astarNodes[n.Id()] = aN
-		}
-	}
 
 	aN := &astarNode{
 		last:            nil,
@@ -57,7 +45,6 @@ func (a *astar) Path(source interfaces.Node, destination interfaces.Node) ([]int
 	}
 	a.heap.Insert(aN, 0)
 	astarNodes[source.Id()] = aN
-
 	for len(explored) < len(a.graph.Nodes()) {
 		i, v := a.heap.ExtractMin()
 		currentHeapNode := node{
@@ -69,23 +56,33 @@ func (a *astar) Path(source interfaces.Node, destination interfaces.Node) ([]int
 		explored[currentRealNode.Id()] = ""
 		if currentRealNode.Id() == destination.Id() {
 			path, weight := a.fetchPath(currentHeapNode.Tag().(*astarNode))
+			//println(len(path))
 			return path, weight, len(explored)
-
 		}
 		for _, edge := range currentRealNode.OutEdges() {
 			destinationRealNode := edge.To()
-			destinationAStarNode := astarNodes[destinationRealNode.Id()]
-			if _, ok := explored[destinationRealNode.Id()]; !ok {
-				newDistance := edge.Weight() + currentAStarNode.accumulatedDist + a.H(currentRealNode, destinationRealNode)
-
-				err := a.heap.DecreaseKey(destinationAStarNode, newDistance)
-				if err == nil {
-					destinationAStarNode.last = currentAStarNode
-					destinationAStarNode.lastDistance = edge.Weight()
-					destinationAStarNode.edgeType = edge.EdgeType()
-					destinationAStarNode.accumulatedDist = edge.Weight() + currentAStarNode.accumulatedDist
+			var destinationAStarNode *astarNode
+			var ok bool
+			if destinationAStarNode, ok = astarNodes[destinationRealNode.Id()]; !ok {
+				astarNodes[destinationRealNode.Id()] = &astarNode{
+					last:            nil,
+					accumulatedDist: math.Inf(1),
+					realNode:        destinationRealNode,
 				}
+			}
+			destinationAStarNode = astarNodes[destinationRealNode.Id()]
+			if _, ok := explored[destinationRealNode.Id()]; !ok {
+				newDistance := edge.Weight() + currentAStarNode.accumulatedDist + a.H(destination, destinationRealNode)
 
+				if destinationAStarNode.accumulatedDist > edge.Weight()+currentAStarNode.accumulatedDist {
+					err := a.heap.Insert(destinationAStarNode, newDistance)
+					if err == nil {
+						destinationAStarNode.last = currentAStarNode
+						destinationAStarNode.lastDistance = edge.Weight()
+						destinationAStarNode.edgeType = edge.EdgeType()
+						destinationAStarNode.accumulatedDist = edge.Weight() + currentAStarNode.accumulatedDist
+					}
+				}
 			}
 		}
 	}
