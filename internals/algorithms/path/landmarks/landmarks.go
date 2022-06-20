@@ -33,11 +33,11 @@ func (n *node) Key() float64 {
 type Dijkstra struct {
 	heap  *fibHeap.FibHeap
 	graph interfaces.Graph
-	lats [12]float64
-	lons [12]float64
+	lats  [12]float64
+	lons  [12]float64
 }
 
-func (d* Dijkstra) ProcessLandmarks () {
+func (d *Dijkstra) ProcessLandmarks() {
 	landmarks := initLandmarks(d.graph.NodesMap())
 	for i, n := range landmarks {
 		d.lats[i] = n.Latitude()
@@ -46,7 +46,7 @@ func (d* Dijkstra) ProcessLandmarks () {
 	}
 }
 
-func initLandmarks(nodesMap map[string]interfaces.Node) ([]interfaces.Node) {
+func initLandmarks(nodesMap map[string]interfaces.Node) []interfaces.Node {
 	landmarks := []interfaces.Node{
 		nodesMap["walk_1227750946"],
 		nodesMap["walk_1319947243"],
@@ -61,14 +61,14 @@ func initLandmarks(nodesMap map[string]interfaces.Node) ([]interfaces.Node) {
 		nodesMap["walk_4580255471"],
 		nodesMap["walk_1164520592"],
 	}
-	
+
 	return landmarks
 }
 
-func (d *Dijkstra) PreprocessLandmark(landmark int, source interfaces.Node) () {
+func (d *Dijkstra) PreprocessLandmark(landmark int, source interfaces.Node) {
 	explored := make(map[string]interface{})
 	dijkstraNodes := make(map[string]*dijkstraNode)
-	
+
 	// populate heap and map with all nodes with +infinity distance
 	for _, n := range d.graph.Nodes() {
 		if n.Id() != source.Id() {
@@ -101,10 +101,10 @@ func (d *Dijkstra) PreprocessLandmark(landmark int, source interfaces.Node) () {
 		currentDijkstraNode := currentHeapNode.Tag().(*dijkstraNode)
 		currentRealNode := currentDijkstraNode.realNode
 		explored[currentRealNode.Id()] = ""
-		
+
 		// update node with distance from landmark
 		currentRealNode.AddFromLandmark(landmark, currentDijkstraNode.accumulatedDist)
-		
+
 		// update out nodes distances in heap
 		for _, edge := range currentRealNode.OutEdges() {
 			destinationRealNode := edge.To()
@@ -132,70 +132,70 @@ func NewDijkstra(graph interfaces.Graph) *Dijkstra {
 func (d *Dijkstra) SelectActiveLandmarks(from interfaces.Node, to interfaces.Node) [4]int {
 	var active [4]int
 	var lowerLeft, lowerRight, upperLeft, upperRight bool
-	
+
 	for i := 0; i < 12; i++ {
-		if (from.Latitude() < to.Latitude()) {
-			if (d.lats[i] < from.Latitude() && d.lons[i] < from.Longitude()) {
-				if (lowerLeft && d.lats[active[0]] < d.lats[i]) {
+		if from.Latitude() < to.Latitude() {
+			if d.lats[i] < from.Latitude() && d.lons[i] < from.Longitude() {
+				if lowerLeft && d.lats[active[0]] < d.lats[i] {
 					active[0] = i
-				} else if (!lowerLeft) {
+				} else if !lowerLeft {
 					active[0] = i
 					lowerLeft = true
 				}
 			}
-			if (d.lats[i] < from.Latitude() && d.lons[i] > from.Longitude()) {
-				if (lowerRight && d.lats[active[1]] < d.lats[i]) {
+			if d.lats[i] < from.Latitude() && d.lons[i] > from.Longitude() {
+				if lowerRight && d.lats[active[1]] < d.lats[i] {
 					active[1] = i
-				} else if (!lowerRight) {
+				} else if !lowerRight {
 					active[1] = i
 					lowerRight = true
 				}
 			}
-			if (d.lats[i] > to.Latitude() && d.lons[i] < to.Longitude()) {
-				if (upperLeft && d.lats[active[2]] > d.lats[i]) {
+			if d.lats[i] > to.Latitude() && d.lons[i] < to.Longitude() {
+				if upperLeft && d.lats[active[2]] > d.lats[i] {
 					active[2] = i
-				} else if (!upperLeft) {
+				} else if !upperLeft {
 					active[2] = i
 					upperLeft = true
 				}
 			}
-			if (d.lats[i] > to.Latitude() && d.lons[i] > to.Longitude()) {
-				if (upperRight && d.lats[active[3]] > d.lats[i]) {
+			if d.lats[i] > to.Latitude() && d.lons[i] > to.Longitude() {
+				if upperRight && d.lats[active[3]] > d.lats[i] {
 					active[3] = i
-				} else if (!upperRight) {
+				} else if !upperRight {
 					active[3] = i
 					upperRight = true
 				}
 			}
 		} else {
-			if (d.lats[i] < to.Latitude() && d.lons[i] < to.Longitude()) {
-				if (lowerLeft && d.lats[active[0]] < d.lats[i]) {
+			if d.lats[i] < to.Latitude() && d.lons[i] < to.Longitude() {
+				if lowerLeft && d.lats[active[0]] < d.lats[i] {
 					active[0] = i
-				} else if (!lowerLeft) {
+				} else if !lowerLeft {
 					active[0] = i
 					lowerLeft = true
 				}
 			}
-			if (d.lats[i] < to.Latitude() && d.lons[i] > to.Longitude()) {
-				if (lowerRight && d.lats[active[1]] < d.lats[i]) {
+			if d.lats[i] < to.Latitude() && d.lons[i] > to.Longitude() {
+				if lowerRight && d.lats[active[1]] < d.lats[i] {
 					active[1] = i
-				} else if (!lowerRight) {
+				} else if !lowerRight {
 					active[1] = i
 					lowerRight = true
 				}
 			}
-			if (d.lats[i] > from.Latitude() && d.lons[i] < from.Longitude()) {
-				if (upperLeft && d.lats[active[2]] > d.lats[i]) {
+			if d.lats[i] > from.Latitude() && d.lons[i] < from.Longitude() {
+				if upperLeft && d.lats[active[2]] > d.lats[i] {
 					active[2] = i
-				} else if (!upperLeft) {
+				} else if !upperLeft {
 					active[2] = i
 					upperLeft = true
 				}
 			}
-			if (d.lats[i] > from.Latitude() && d.lons[i] > from.Longitude()) {
-				if (upperRight && d.lats[active[3]] > d.lats[i]) {
+			if d.lats[i] > from.Latitude() && d.lons[i] > from.Longitude() {
+				if upperRight && d.lats[active[3]] > d.lats[i] {
 					active[3] = i
-				} else if (!upperRight) {
+				} else if !upperRight {
 					active[3] = i
 					upperRight = true
 				}
@@ -209,15 +209,15 @@ func (d *Dijkstra) SelectActiveLandmarks(from interfaces.Node, to interfaces.Nod
 func Heuristic(from interfaces.Node, to interfaces.Node, activeLandmarks [4]int) float64 {
 	fromL := from.GetFromLandmarks()
 	toL := to.GetFromLandmarks()
-	
+
 	var max float64
-	
+
 	for _, i := range activeLandmarks {
 		potential := math.Abs(fromL[i] - toL[i])
-		if (potential > max) {
+		if potential < max {
 			max = potential
 		}
 	}
-	
+
 	return max
 }

@@ -200,14 +200,14 @@ func (g *Graph) RemoveNodes(nodes []interfaces.Node) {
 	}
 }
 
-func (g *Graph) RemoveNode(node *Node) {
+func (g *Graph) RemoveNode(node interfaces.Node) {
 	for i, n := range g.nodes {
-		if n.Id() == node.id {
+		if n.Id() == node.Id() {
 			g.nodes = append(g.nodes[:i], g.nodes[i+1:]...)
 			break
 		}
 	}
-	delete(g.nodesMap, node.id)
+	delete(g.nodesMap, node.Id())
 }
 
 func (g *Graph) GetClosestNode(node interfaces.Node) (interfaces.Node, float64) {

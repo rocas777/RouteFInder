@@ -34,4 +34,6 @@ type Graph interface {
 
 	Init()
 	GetEdges() []Edge
+
+	RemoveNode(node Node)
 }
