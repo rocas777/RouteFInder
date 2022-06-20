@@ -2,11 +2,8 @@ package menuHelper
 
 import (
 	"edaa/internals/algorithms/path/astar"
-<<<<<<< HEAD
-	"edaa/internals/algorithms/path/landmarks"
-=======
 	"edaa/internals/algorithms/path/genetics"
->>>>>>> c7a12ff8d8ed9e6858b87dd7afad6cb858da02ac
+	"edaa/internals/algorithms/path/landmarks"
 	"edaa/internals/dataStructures/kdtree"
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
@@ -96,9 +93,9 @@ func PathFinderLandmarks(g interfaces.Graph, tree *kdtree.KDTree, d *landmarks.D
 	// if elat != 0 || elon != 0 {
 	// 	endNode, _ = tree.GetClosest(graph.NewNormalNode(elat, elon, "", "", ""))
 	// }
-	
+
 	activeLandmarks := d.SelectActiveLandmarks(startNode, endNode)
-	
+
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
 		return landmarks.Heuristic(from, to, activeLandmarks)
 	})
