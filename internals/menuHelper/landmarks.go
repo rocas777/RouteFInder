@@ -5,7 +5,8 @@ import (
 	"edaa/internals/interfaces"
 )
 
-func Landmarks (g interfaces.Graph) {
+func Landmarks (g interfaces.Graph) (l *landmarks.Dijkstra) {
 	d := landmarks.NewDijkstra(g)
 	d.ProcessLandmarks()
+	return d
 }
