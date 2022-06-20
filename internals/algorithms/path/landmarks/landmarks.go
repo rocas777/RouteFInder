@@ -214,7 +214,7 @@ func Heuristic(from interfaces.Node, to interfaces.Node, activeLandmarks [4]int)
 
 	for _, i := range activeLandmarks {
 		potential := math.Abs(fromL[i] - toL[i])
-		if potential < max {
+		if potential > max {
 			max = potential
 		}
 	}
