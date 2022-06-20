@@ -2,6 +2,7 @@ package menuHelper
 
 import (
 	"edaa/internals/algorithms/path/astar"
+	"edaa/internals/algorithms/path/genetics"
 	"edaa/internals/dataStructures/kdtree"
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
@@ -12,7 +13,7 @@ import (
 func PathFinder(g interfaces.Graph, tree *kdtree.KDTree) {
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
 		return 0
-		return utils.GetDistanceBetweenNodes(from, to) / (33 / 3.6)
+		return utils.GetDistanceBetweenNodes(from, to) / (20)
 	})
 
 	startNode := g.Nodes()[7999]
@@ -44,10 +45,6 @@ func PathFinder(g interfaces.Graph, tree *kdtree.KDTree) {
 }
 
 func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
-	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
-		return 9999 * utils.GetDistanceBetweenNodes(from, to) / (33 / 3.6)
-	})
-
 	startNode := g.Nodes()[7999]
 	endNode := g.Nodes()[157000]
 	var slat float64
@@ -70,7 +67,7 @@ func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
 	//startNode := g.NodesMap()["metro_27"]
 	//endNode := g.NodesMap()["metro_76"]
 
-	path, pathTime, explored := as.Path(startNode, endNode)
+	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode)
 
 	astar.PreetyDisplay(path, pathTime, explored, startNode, endNode)
 	astar.ExportEdgesGenetics(path)

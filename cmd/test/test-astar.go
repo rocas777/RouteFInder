@@ -15,7 +15,7 @@ func main() {
 	buildTestGraph(g)
 
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
-		return utils.GetDistance(from.Latitude(), from.Longitude(), to.Latitude(), to.Longitude())
+		return utils.GetDistance(from.Latitude(), from.Longitude(), to.Latitude(), to.Longitude()) / (20)
 	})
 
 	path, time, explored := as.Path(g.NodesMap()["node0"], g.NodesMap()["node15"])
