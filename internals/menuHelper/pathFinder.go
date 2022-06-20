@@ -13,7 +13,6 @@ import (
 
 func PathFinder(g interfaces.Graph, tree *kdtree.KDTree) {
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
-		return 0
 		return utils.GetDistanceBetweenNodes(from, to) / (20)
 	})
 
