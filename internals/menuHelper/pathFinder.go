@@ -67,7 +67,7 @@ func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
 	//startNode := g.NodesMap()["metro_27"]
 	//endNode := g.NodesMap()["metro_76"]
 
-	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode)
+	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode, tree)
 
 	astar.PreetyDisplay(path, pathTime, explored, startNode, endNode)
 	astar.ExportEdgesGenetics(path)

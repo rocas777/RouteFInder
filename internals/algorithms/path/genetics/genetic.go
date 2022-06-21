@@ -18,9 +18,7 @@ type solution struct {
 	weight float64
 }
 
-func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node) ([]interfaces.Edge, float64, int) {
-	kdtree := kdtree2.NewKDTree(g)
-
+func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree) ([]interfaces.Edge, float64, int) {
 	initTime := time.Now()
 
 	middleStopLat := (start.Latitude() + end.Latitude()) / 2
@@ -75,7 +73,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node)
 		sol1, sol2, sol3, sol4,
 	}
 	var bv float64 = 0
-	wait := 10
+	wait := 5
 	var last []float64
 	for {
 		last = append(last, bv)
@@ -99,13 +97,6 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node)
 	fmt.Println("best path:", bv)
 	fmt.Println(time.Since(initTime))
 
-	initTime = time.Now()
-	bp, _, _ := GetBestSolution(g, start, end)
-	fmt.Println(time.Since(initTime))
-
-	fmt.Println(start.Id(), end.Id())
-
-	fmt.Println("Best Result:", cost(bp))
 	return p1, t1, explored1
 }
 

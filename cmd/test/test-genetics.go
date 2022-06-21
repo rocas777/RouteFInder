@@ -2,6 +2,7 @@ package main
 
 import (
 	"edaa/internals/algorithms/path/genetics"
+	kdtree2 "edaa/internals/dataStructures/kdtree"
 	"edaa/internals/exports/reuse"
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
@@ -16,7 +17,8 @@ func main() {
 
 	//walk_6055022105 walk_4758581322
 	println(g.Nodes()[0].Id(), g.Nodes()[10000].Id())
-	genetics.GeneticPath(g, g.Nodes()[0], g.Nodes()[1000])
+	kdtree := kdtree2.NewKDTree(g)
+	genetics.GeneticPath(g, g.Nodes()[0], g.Nodes()[1000], kdtree)
 }
 
 func clean(g *graph.Graph) {
