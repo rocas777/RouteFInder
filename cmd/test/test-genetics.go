@@ -6,7 +6,10 @@ import (
 	"edaa/internals/exports/reuse"
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
+	"fmt"
 	"math"
+	"math/rand"
+	"time"
 )
 
 func main() {
@@ -16,9 +19,44 @@ func main() {
 	//clean(g)
 
 	//walk_6055022105 walk_4758581322
-	println(g.Nodes()[0].Id(), g.Nodes()[10000].Id())
+
+	rand.Seed(time.Now().UnixNano())
+
+	var cycles uint64 = 0
+	var bad uint64 = 0
+	c := make(chan int)
 	kdtree := kdtree2.NewKDTree(g)
-	genetics.GeneticPath(g, g.Nodes()[0], g.Nodes()[1000], kdtree)
+
+	maxGoroutines := 10
+	guard := make(chan struct{}, maxGoroutines)
+
+	go func() {
+		for ; cycles < 100; cycles++ {
+			guard <- struct{}{} // would block if guard channel is already filled
+			go func(n uint64) {
+				genticIteration(g, c, kdtree)
+				<-guard
+			}(cycles)
+		}
+	}()
+	for i := 0; i < 100; i++ {
+		select {
+		case r := <-c:
+			println(i)
+			if r == 0 {
+				bad++
+			}
+		}
+	}
+	fmt.Println("Cycles:", cycles)
+	fmt.Println("Bad:", bad)
+}
+
+func genticIteration(g *graph.Graph, c chan int, kdtree *kdtree2.KDTree) {
+	p1 := rand.Intn(len(g.Nodes()))
+	p2 := rand.Intn(len(g.Nodes()))
+	_, _, ok := genetics.GeneticPath(g, g.Nodes()[p1], g.Nodes()[p2], kdtree)
+	c <- ok
 }
 
 func clean(g *graph.Graph) {

@@ -6,7 +6,6 @@ import (
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
 	"edaa/internals/utils"
-	"fmt"
 	"math"
 	"math/rand"
 	"os"
@@ -19,7 +18,7 @@ type solution struct {
 }
 
 func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree) ([]interfaces.Edge, float64, int) {
-	initTime := time.Now()
+	//initTime := time.Now()
 
 	middleStopLat := (start.Latitude() + end.Latitude()) / 2
 	middleStopLon := (start.Longitude() + end.Longitude()) / 2
@@ -35,7 +34,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	tn, _ := kdtree.GetClosest(graph.NewNormalNode(thirdStopLat, thirdStopLon, "", "", ""))
 
 	w := 10.0
-	p1, t1, explored1 := GetSolution(g, start, mn, w)
+	p1, t1, _ := GetSolution(g, start, mn, w)
 	p2, _, _ := GetSolution(g, mn, end, w)
 
 	p11, _, _ := GetSolution(g, start, fn, w)
@@ -73,7 +72,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 		sol1, sol2, sol3, sol4,
 	}
 	var bv float64 = 0
-	wait := 5
+	wait := 10
 	var last []float64
 	for {
 		last = append(last, bv)
@@ -93,11 +92,29 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 		sol, bv = geneticPass(g, sol, bv)
 	}
 
-	println("dest:", sol[0].path[len(sol[0].path)-1].To().Id())
-	fmt.Println("best path:", bv)
-	fmt.Println(time.Since(initTime))
+	//println()
+	//println("Genetic:")
+	//fmt.Println("Best path:", bv)
+	//println("dest:", sol[0].path[len(sol[0].path)-1].To().Id())
+	//fmt.Println(time.Since(initTime))
 
-	return p1, t1, explored1
+	//initTime = time.Now()
+	bp, _, _ := GetBestSolution(g, start, end)
+
+	//println()
+	//println("Optimal:")
+	//fmt.Println("Best Result:", cost(bp))
+	//fmt.Println(start.Id(), end.Id())
+	//fmt.Println(time.Since(initTime))
+
+	return p1, t1, checkBitSetVar(sol[0].path[len(sol[0].path)-1].To().Id() == end.Id() && cost(bp) <= bv)
+}
+
+func checkBitSetVar(mybool bool) int {
+	if mybool {
+		return 1
+	}
+	return 0 //you just saved youself an else here!
 }
 
 func getRandDiff(diff int, limit int) int {
@@ -150,7 +167,6 @@ func geneticPass(g interfaces.Graph, solutions []solution, last float64) ([]solu
 	}
 	nextGen = append(nextGen, children...)
 
-	//t := time.Now()
 	for _, s := range nextGen {
 		if rand.Intn(50) <= 1 {
 			mutate(g, &s)
@@ -240,6 +256,9 @@ func mutate(g interfaces.Graph, sol *solution) {
 	//p2 = int(math.Min(float64(p1+300), float64(p2)))
 	if p1+1 == p2 {
 		p2++
+	}
+	if p2 >= len(sol.path) {
+		p2 = len(sol.path) - 1
 	}
 	w := float64(len(sol.path)) / (float64(len(sol.path)) - float64(p2-p1))
 	w = w * 10
