@@ -30,4 +30,8 @@ type Node interface {
 
 	AddDestination(destination Node, weight float64)
 	RemoveConnections(nodeToRemove Node)
+	
+	AddFromLandmark(landmark int, dist float64)
+	
+	GetFromLandmarks() [12]float64
 }

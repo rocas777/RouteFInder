@@ -45,6 +45,7 @@ func (a *astar) Path(source interfaces.Node, destination interfaces.Node) ([]int
 	}
 	a.heap.Insert(aN, 0)
 	astarNodes[source.Id()] = aN
+
 	for len(explored) < len(a.graph.Nodes()) {
 		i, v := a.heap.ExtractMin()
 		currentHeapNode := node{
