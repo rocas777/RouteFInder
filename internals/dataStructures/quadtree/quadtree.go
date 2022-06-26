@@ -2,12 +2,9 @@ package quadtree
 
 import (
 	"edaa/internals/interfaces"
-	"edaa/internals/visualization"
-	tile_server "edaa/internals/visualization/tile-server"
 	"fmt"
 	"math"
 	"runtime"
-	"sync"
 )
 
 func NewQuadTree(g interfaces.Graph) *QuadTree {
@@ -34,8 +31,8 @@ func NewQuadTree(g interfaces.Graph) *QuadTree {
 		}
 	}
 
-	//println(top_left_lat, top_left_lon)
-	//println(bottom_right_lat, bottom_right_lon)
+	//fmt.Println(top_left_lat, top_left_lon)
+	//fmt.Println(bottom_right_lat, bottom_right_lon)
 
 	q := &quad{
 		nodes: append([]interfaces.Node{}, g.Nodes()...),
@@ -49,43 +46,7 @@ func NewQuadTree(g interfaces.Graph) *QuadTree {
 
 	PrintMemUsage()
 
-	oq := q.sw.nw.ne
-
-	var wg sync.WaitGroup
-
-	nq := oq.nw
-	wg.Add(1)
-	go func(nq interfaces.Quad) {
-		visualization.DrawQuad(nq,q,"nw")
-		defer wg.Done()
-	}(nq)
-
-	nq = oq.ne
-	wg.Add(1)
-	go func(nq interfaces.Quad) {
-		visualization.DrawQuad(nq,q,"ne")
-		defer wg.Done()
-	}(nq)
-
-	nq = oq.sw
-	wg.Add(1)
-	go func(nq interfaces.Quad) {
-		visualization.DrawQuad(nq,q,"sw")
-		defer wg.Done()
-	}(nq)
-
-	nq = oq.se
-	wg.Add(1)
-	go func(nq interfaces.Quad) {
-		visualization.DrawQuad(nq,q,"se")
-		defer wg.Done()
-	}(nq)
-
-	wg.Wait()
-
-	tile_server.TileServer(q)
-
-	return &QuadTree{}
+	return &QuadTree{Root: q}
 }
 
 var i = 0
@@ -106,7 +67,7 @@ func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) (int,[]interfa
 		return 1,[]interfaces.Node{n}
 	}
 
-	//println(depth, q.tlLat-q.brLat, q.tlLon-q.brLon)
+	//fmt.Println(depth, q.tlLat-q.brLat, q.tlLon-q.brLon)
 	mLat := (q.brLat + q.tlLat) / 2.0
 	mLon := (q.brLon + q.tlLon) / 2.0
 

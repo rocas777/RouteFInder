@@ -67,5 +67,5 @@ func newQuad(tlLat float64, tlLon float64, brLat float64, brLon float64) *quad {
 
 
 type QuadTree struct {
-	root *quad
+	Root *quad
 }

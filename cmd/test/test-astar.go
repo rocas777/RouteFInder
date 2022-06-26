@@ -24,8 +24,8 @@ func main() {
 		fmt.Printf("%s -> %s  %s  %f\n", vertex.From().Id(), vertex.To().Id(), vertex.EdgeType(), vertex.Weight())
 	}
 
-	println("time:", time)
-	println("explored nodes:", explored)
+	fmt.Println("time:", time)
+	fmt.Println("explored nodes:", explored)
 }
 
 func buildTestGraph(g *graph.Graph) {

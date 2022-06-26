@@ -3,6 +3,7 @@ package graph
 import (
 	"edaa/internals/interfaces"
 	"errors"
+	"fmt"
 	"github.com/gocarina/gocsv"
 	"os"
 	"strings"
@@ -32,16 +33,16 @@ func InitReuse(g interfaces.Graph) {
 	g.SetMetroableNodes(make(map[string]interfaces.Node))
 
 	if _, err := os.Stat("data/reuse/nodes.csv"); errors.Is(err, os.ErrNotExist) {
-		println("You should run setup first")
+		fmt.Println("You should run setup first")
 		os.Exit(1)
 	}
 	if _, err := os.Stat("data/reuse/edges.csv"); errors.Is(err, os.ErrNotExist) {
-		println("You should run setup first")
+		fmt.Println("You should run setup first")
 		os.Exit(1)
 	}
 	loadNodes(g)
 	loadEdges(g)
-	println("loaded", len(g.Nodes()), "nodes")
+	fmt.Println("loaded", len(g.Nodes()), "nodes")
 }
 
 func loadNodes(g interfaces.Graph) {

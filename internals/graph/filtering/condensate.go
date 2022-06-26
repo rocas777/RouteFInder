@@ -3,6 +3,7 @@ package filtering
 import (
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
+	"fmt"
 )
 
 func Condensate(g *graph.Graph) {
@@ -39,6 +40,6 @@ func Condensate(g *graph.Graph) {
 		}
 	}
 	g.RemoveNodes(nodesToRemove)
-	println("number of removed nodes", counter)
-	println("new ammount of nodes", len(g.Nodes()))
+	fmt.Println("number of removed nodes", counter)
+	fmt.Println("new ammount of nodes", len(g.Nodes()))
 }

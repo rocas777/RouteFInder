@@ -8,13 +8,37 @@ import (
 	"io"
 	"log"
 	"math"
+	"math/rand"
 	"net/http"
 	"os"
 	"reflect"
 	"strconv"
+	"time"
 )
 
-func TileServer(q interfaces.Quad){
+var path []interfaces.Edge
+
+var killer  = make(chan interface{})
+
+func AddPath(edges []interfaces.Edge){
+	os.RemoveAll("images/")
+	os.MkdirAll("images/",777)
+	path = edges
+}
+
+func ClearPath(){
+	os.RemoveAll("images/")
+	os.MkdirAll("images/",777)
+	path = []interfaces.Edge{}
+}
+
+func TileServer(q interfaces.Quad,kill chan interface{}){
+	killer = kill
+	rand.Seed(time.Now().UnixNano())
+
+	adder := strconv.Itoa(rand.Int())
+
+	ClearPath()
 	r := mux.NewRouter()
 	r.HandleFunc("/{z}/{x}/{y}", func(w http.ResponseWriter, r *http.Request){
 		vars := mux.Vars(r)
@@ -65,15 +89,17 @@ func TileServer(q interfaces.Quad){
 				}
 			}
 		}
-		println(x,y, z)
 
-		a,b := exploringNode.GetNodesPos()
-		imgN +=strconv.Itoa(b-a)
-
-		if _, err := os.Stat("images/"+imgN+".png"); errors.Is(err, os.ErrNotExist) {
-			visualization.DrawQuad(exploringNode,q,imgN)
+		if reflect.ValueOf(exploringNode).IsNil(){
+			return
 		}
 
+		a,b := exploringNode.GetNodesPos()
+		imgN +=strconv.Itoa(b-a)+"-"+adder
+
+		if _, err := os.Stat("images/"+imgN+".png"); errors.Is(err, os.ErrNotExist) {
+			visualization.DrawQuad(exploringNode,q,imgN,path)
+		}
 
 		img, err := os.Open("images/"+imgN+".png")
 		if err != nil {
@@ -84,5 +110,10 @@ func TileServer(q interfaces.Quad){
 		io.Copy(w, img)
 
 	})
-	http.ListenAndServe("localhost:8000", r)
+	if kill != nil{
+		go http.ListenAndServe("localhost:8000", r)
+		<- kill;
+	}else{
+		http.ListenAndServe("localhost:8000", r)
+	}
 }

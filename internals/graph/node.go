@@ -3,6 +3,7 @@ package graph
 import (
 	"edaa/internals/interfaces"
 	"edaa/internals/types"
+	"fmt"
 )
 
 type Node struct {
@@ -110,7 +111,7 @@ func (n *Node) AddDestination(destination interfaces.Node, weight float64) {
 	}
 
 	if weight == 0 {
-		println(n.id, destination.Id())
+		fmt.Println(n.id, destination.Id())
 		panic("")
 	}
 	destination.SetReferenced(true)

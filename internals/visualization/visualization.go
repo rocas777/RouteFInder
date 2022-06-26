@@ -7,7 +7,7 @@ import (
 	"github.com/fogleman/gg"
 )
 
-func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string) {
+func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string,path []interfaces.Edge) {
 	s,e := quad.GetNodesPos()
 
 	nodes := original.Nodes()[s:e]
@@ -40,7 +40,16 @@ func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string) {
 		}
 		ctx.SetRGB(0, 0, 0)
 		ctx.Stroke()
+
+
+
 	}
+	for _, e := range path {
+		primitives.DrawEdge(e, ctx, quad)
+	}
+	ctx.SetRGB(1, 0, 0)
+	ctx.SetLineWidth(10)
+	ctx.Stroke()
 
 	ctx.SavePNG("images/"+name+".png")
 }

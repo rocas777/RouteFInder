@@ -7,26 +7,27 @@ import (
 	"edaa/internals/graph"
 	"edaa/internals/graph/filtering"
 	"edaa/internals/interfaces"
+	"fmt"
 )
 
 func Setup() interfaces.Graph {
-	println("")
-	println("Starting Setup")
+	fmt.Println("")
+	fmt.Println("Starting Setup")
 
 	g := graph.Graph{}
-	println("")
-	println("Initiating graph...")
+	fmt.Println("")
+	fmt.Println("Initiating graph...")
 	g.Init()
 
 	//lat1, lat2, lon1, lon2 := g.GetCoordsBox()
 	//filtering.Crop(&g, lat1+((lat2-lat1)/2), lon1+((lon2-lon1)/2), lat2, lon2)
 
-	println("")
-	println("Cleaning graph from isolated nodes...")
+	fmt.Println("")
+	fmt.Println("Cleaning graph from isolated nodes...")
 	cleanGraph(&g)
 
-	println("")
-	println("Connecting Stations to road Network...")
+	fmt.Println("")
+	fmt.Println("Connecting Stations to road Network...")
 	tree := kdtree.NewKDTree(&g)
 	filtering.ConnectGraphs(&g, tree)
 
@@ -35,12 +36,12 @@ func Setup() interfaces.Graph {
 
 	//filtering.Condensate(&g)
 
-	println("")
-	println("Removing Broken edges...")
+	fmt.Println("")
+	fmt.Println("Removing Broken edges...")
 	filtering.RemoveBrokenEdges(&g)
 
-	println("")
-	println("Exporting data to reuse in the future...")
+	fmt.Println("")
+	fmt.Println("Exporting data to reuse in the future...")
 	reuse.ExportEdges(&g, "data/reuse/edges.csv")
 	reuse.ExportNodes(&g, "data/reuse/nodes.csv")
 

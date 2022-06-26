@@ -9,8 +9,8 @@ import (
 )
 
 func PreetyDisplay(path []interfaces.Edge, pathTime float64, explored int, startNode, endNode interfaces.Node) {
-	println("")
-	println("")
+	fmt.Println("")
+	fmt.Println("")
 	roadTime := 0.0
 	busTime := 0.0
 	metroTime := 0.0
@@ -25,18 +25,18 @@ func PreetyDisplay(path []interfaces.Edge, pathTime float64, explored int, start
 			metroTime += vertex.Weight()
 		}
 	}
-	println("")
-	println("")
+	fmt.Println("")
+	fmt.Println("")
 
 	fmt.Printf("Start: %f,%f\n", startNode.Latitude(), startNode.Longitude())
 	fmt.Printf("End: %f,%f\n", endNode.Latitude(), endNode.Longitude())
 	fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
 	fmt.Printf("Distance: %f km\n", utils.GetDistanceBetweenNodes(startNode, endNode)/1000)
 
-	println("")
+	fmt.Println("")
 	fmt.Printf("Road Time: %d s\n", int(roadTime))
 	fmt.Printf("Bus Time: %d s\n", int(busTime))
 	fmt.Printf("Metro Time: %d s\n", int(metroTime))
 
-	println("Explored nodes:", explored)
+	fmt.Println("Explored nodes:", explored)
 }

@@ -42,7 +42,7 @@ func main() {
 	for i := 0; i < 100; i++ {
 		select {
 		case r := <-c:
-			println(i)
+			fmt.Println(i)
 			if r == 0 {
 				bad++
 			}
@@ -75,8 +75,8 @@ func clean(g *graph.Graph) {
 			}
 		}
 		g.RemoveNodes(nodesToRemove)
-		println("Removed Nodes", i)
-		println(len(g.Nodes()))
+		fmt.Println("Removed Nodes", i)
+		fmt.Println(len(g.Nodes()))
 	}
 	reuse.ExportEdges(g, "data/reuse/edges.csv")
 	reuse.ExportNodes(g, "data/reuse/nodes.csv")

@@ -90,7 +90,7 @@ func main() {
 		panic(err)
 	}
 
-	println("Preparing XML", len(nodes), len(ways))
+	fmt.Println("Preparing XML", len(nodes), len(ways))
 
 	o := osm.OSM{
 		Version:   0.6,
@@ -102,7 +102,7 @@ func main() {
 
 	data, _ := xml.MarshalIndent(o, " ", "	")
 
-	println("Xml prepared, writing to file")
+	fmt.Println("Xml prepared, writing to file")
 	err = os.WriteFile("data/road/compressed.xml", data, 0644)
 	if err != nil {
 		return

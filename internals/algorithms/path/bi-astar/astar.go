@@ -57,7 +57,7 @@ func (a *astar) Path(source interfaces.Node, destination interfaces.Node) ([]int
 		explored[currentRealNode.Id()] = ""
 		if currentRealNode.Id() == destination.Id() {
 			path, weight := a.fetchPath(currentHeapNode.Tag().(*astarNode))
-			//println(len(path))
+			//fmt.Println(len(path))
 			return path, weight, len(explored)
 		}
 		for _, edge := range currentRealNode.OutEdges() {

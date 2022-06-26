@@ -3,6 +3,7 @@ package main
 import (
 	kdtree "edaa/internals/dataStructures/quadtree"
 	"edaa/internals/graph"
+	tile_server "edaa/internals/visualization/tile-server"
 )
 
 func main() {
@@ -10,6 +11,6 @@ func main() {
 	g := &graph.Graph{}
 	graph.InitReuse(g)
 
-	kdtree.NewQuadTree(g)
-
+	quadtree := kdtree.NewQuadTree(g)
+	tile_server.TileServer(quadtree.Root,nil)
 }

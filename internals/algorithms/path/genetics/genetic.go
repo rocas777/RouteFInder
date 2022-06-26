@@ -92,17 +92,17 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 		sol, bv = geneticPass(g, sol, bv)
 	}
 
-	//println()
-	//println("Genetic:")
+	//fmt.Println()
+	//fmt.Println("Genetic:")
 	//fmt.Println("Best path:", bv)
-	//println("dest:", sol[0].path[len(sol[0].path)-1].To().Id())
+	//fmt.Println("dest:", sol[0].path[len(sol[0].path)-1].To().Id())
 	//fmt.Println(time.Since(initTime))
 
 	//initTime = time.Now()
 	bp, _, _ := GetBestSolution(g, start, end)
 
-	//println()
-	//println("Optimal:")
+	//fmt.Println()
+	//fmt.Println("Optimal:")
 	//fmt.Println("Best Result:", cost(bp))
 	//fmt.Println(start.Id(), end.Id())
 	//fmt.Println(time.Since(initTime))

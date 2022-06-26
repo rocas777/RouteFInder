@@ -104,7 +104,7 @@ func (g *Graph) Init() {
 	start := time.Now()
 
 	InitBus(g)
-	println("Bus size:", len(g.nodes))
+	fmt.Println("Bus size:", len(g.nodes))
 
 	elapsed := time.Since(start)
 	fmt.Printf("Bus initiation %s\n\n", elapsed)
@@ -112,7 +112,7 @@ func (g *Graph) Init() {
 	start = time.Now()
 
 	InitMetro(g)
-	println("Metro+Bus size:", len(g.nodes))
+	fmt.Println("Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)
 	fmt.Printf("Metro initiation %s\n\n", elapsed)
@@ -120,7 +120,7 @@ func (g *Graph) Init() {
 	start = time.Now()
 
 	InitRoads(g)
-	println("Roads+Metro+Bus size:", len(g.nodes))
+	fmt.Println("Roads+Metro+Bus size:", len(g.nodes))
 
 	elapsed = time.Since(start)
 	fmt.Printf("Roads initiation %s\n\n", elapsed)
