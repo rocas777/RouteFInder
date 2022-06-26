@@ -55,7 +55,7 @@ func main() {
 func genticIteration(g *graph.Graph, c chan int, kdtree *kdtree2.KDTree) {
 	p1 := rand.Intn(len(g.Nodes()))
 	p2 := rand.Intn(len(g.Nodes()))
-	_, _, ok := genetics.GeneticPath(g, g.Nodes()[p1], g.Nodes()[p2], kdtree)
+	_, _, ok := genetics.GeneticPath(g, g.Nodes()[p1], g.Nodes()[p2], kdtree,false)
 	c <- ok
 }
 

@@ -71,7 +71,7 @@ func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
 	//startNode := g.NodesMap()["metro_27"]
 	//endNode := g.NodesMap()["metro_76"]
 
-	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode, tree)
+	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode, tree,false)
 	println(path[len(path)-1].To().Id(),endNode.Id())
 
 	tile_server.AddPath(path)

@@ -5,6 +5,7 @@ import (
 	kdtree2 "edaa/internals/dataStructures/kdtree"
 	"edaa/internals/graph"
 	"edaa/internals/interfaces"
+	"edaa/internals/types"
 	"edaa/internals/utils"
 	"math"
 	"math/rand"
@@ -16,8 +17,18 @@ type solution struct {
 	path   []interfaces.Edge
 	weight float64
 }
+func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree,time bool) ([]interfaces.Edge, float64, int) {
+	if time{
+		p,t,i :=  _geneticPath(g, start, end , kdtree,costTime)
+		return p,t,i
+	}else{
+		p,t,i :=  _geneticPath(g, start, end , kdtree,costCost)
+		return p,t,i
+	}
+}
 
-func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree) ([]interfaces.Edge, float64, int) {
+
+func _geneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree,cost func([]interfaces.Edge) float64) ([]interfaces.Edge, float64, int) {
 	//initTime := time.Now()
 
 	bp, _, _ := GetBestSolution(g, start, end)
@@ -44,6 +55,12 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 
 	p21, _, _ := GetSolution(g, mn, tn, w)
 	p22, _, _ := GetSolution(g, tn, end, w)
+
+	pt, _, _ := GetSolution(g, start, end, w)
+	solt := solution{
+		path:   pt,
+		weight: cost(pt),
+	}
 
 	path1 := make([]interfaces.Edge,0)
 	path1 = append(path1, p1...)
@@ -84,7 +101,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	rand.Seed(time.Now().UnixNano())
 
 	sol := []solution{
-		sol1, sol2, sol3, sol4,
+		sol1, sol2, sol3, sol4,solt,
 	}
 	var bv float64 = 0
 	wait := 10
@@ -104,7 +121,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 				break
 			}
 		}
-		sol, bv = geneticPass(g, sol, bv)
+		sol, bv = geneticPass(g, sol, bv,cost)
 		for _, s := range sol {
 			if s.path[len(s.path)-1].To().Id() != end.Id(){
 				panic("QUIIII!")
@@ -129,7 +146,17 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	//fmt.Println(start.Id(), end.Id())
 	//fmt.Println(time.Since(initTime))
 
-	return sol[0].path, bv, checkBitSetVar(sol[0].path[len(sol[0].path)-1].To().Id() == end.Id() && a <= bv)
+	b := math.Inf(1)
+	pos := 0
+	for i, s := range sol {
+		c := cost(s.path)
+		if cost(s.path) < b{
+			pos = i
+			b = c
+		}
+	}
+
+	return sol[pos].path, bv, checkBitSetVar(sol[pos].path[len(sol[pos].path)-1].To().Id() == end.Id() && a <= bv)
 }
 
 func checkBitSetVar(mybool bool) int {
@@ -147,7 +174,7 @@ func getRandDiff(diff int, limit int) int {
 	return out
 }
 
-func geneticPass(g interfaces.Graph, solutions []solution, last float64) ([]solution, float64) {
+func geneticPass(g interfaces.Graph, solutions []solution, last float64,cost func([]interfaces.Edge) float64) ([]solution, float64) {
 	var nextGen []solution
 	var lastGen []solution
 	var children []solution
@@ -177,7 +204,7 @@ func geneticPass(g interfaces.Graph, solutions []solution, last float64) ([]solu
 		m := rand.Intn(len(lastGen))
 		f := getRandDiff(m, len(lastGen))
 
-		children = append(children, getChild(lastGen[m], lastGen[f]))
+		children = append(children, getChild(lastGen[m], lastGen[f],cost))
 
 		helper := lastGen
 		lastGen = []solution{}
@@ -191,7 +218,7 @@ func geneticPass(g interfaces.Graph, solutions []solution, last float64) ([]solu
 
 	for _, s := range nextGen {
 		if rand.Intn(50) <= 1 {
-			mutate(g, &s)
+			mutate(g, &s,cost)
 		}
 	}
 
@@ -205,13 +232,13 @@ func geneticPass(g interfaces.Graph, solutions []solution, last float64) ([]solu
 	if best == last {
 		toMutate := rand.Intn(len(nextGen))
 		nt := nextGen[toMutate]
-		mutate(g, &nt)
+		mutate(g, &nt,cost)
 		nextGen = append(nextGen, nt)
 	}
 
 	return nextGen, best
 }
-func getChild(m solution, f solution) solution {
+func getChild(m solution, f solution,cost func([]interfaces.Edge) float64) solution {
 	bef := f.path[len(f.path)-1].To().Id()
 
 	out := solution{
@@ -242,12 +269,61 @@ func getChild(m solution, f solution) solution {
 	return out
 }
 
-func cost(path []interfaces.Edge) float64 {
+func costTime(path []interfaces.Edge) float64 {
 	adder := 0.0
 	for _, v := range path {
 		adder += v.Weight()
 	}
 	return adder
+}
+
+
+var prices map[int]float64 = map[int]float64{
+	2 : 1.25,
+	3 : 1.6,
+	4 : 2.0,
+	5 : 2.4,
+	6 : 2.85,
+	7 : 3.25,
+	8 : 3.65,
+	9 : 4.05,
+}
+
+func costCost(path []interfaces.Edge) float64{
+	cost,w,_ := costCostNoPenalty(path)
+	if w >= 5*60{
+		return cost + w / 60 * 10
+	}
+	return cost
+}
+
+func costCostNoPenalty(path []interfaces.Edge) (float64,float64,float64){
+	walk := 0.0
+	transport := 0.0
+	cost := 0.0
+	lastBus := true
+	zones := make(map[string]interface{})
+	for _, v := range path {
+		if v.To().IsStation() {
+			zones[v.To().Zone()] = "";
+		}
+		if lastBus && v.EdgeType() == types.Road{
+			cost += 2.0
+		}
+		if v.EdgeType() != types.Road{
+			lastBus = true;
+			transport += v.Weight()
+		}else{
+			lastBus = false
+			walk += v.Weight()
+		}
+	}
+	/*fmt.Println(cost)
+	fmt.Println(prices[len(zones)])
+	fmt.Println(walk)
+	fmt.Println(transport)
+	fmt.Println()*/
+	return math.Min(cost,prices[len(zones)]),walk,transport
 }
 
 func GetSolution(g interfaces.Graph, start interfaces.Node, end interfaces.Node, multiplier float64) (path []interfaces.Edge, t float64, explored int) {
@@ -268,7 +344,7 @@ func GetBestSolution(g interfaces.Graph, start interfaces.Node, end interfaces.N
 	return
 }
 
-func mutate(g interfaces.Graph, sol *solution) {
+func mutate(g interfaces.Graph, sol *solution,cost func([]interfaces.Edge) float64) {
 	bf := sol.path[0].From().Id()
 	bt := sol.path[len(sol.path)-1].To().Id()
 
