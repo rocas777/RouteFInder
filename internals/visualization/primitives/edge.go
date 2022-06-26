@@ -6,14 +6,14 @@ import (
 )
 
 func DrawEdge(edge interfaces.Edge, ctx *gg.Context, quad interfaces.Quad) {
-	xStandardizer := (quad.BrLon() - quad.TlLon()) * 1000
-	yStandardizer := (quad.BrLat() - quad.TlLat()) * 1000
+	xStandardizer := 1000 / (quad.BrLon() - quad.TlLon())
+	yStandardizer :=  1000 / (quad.BrLat() - quad.TlLat())
 
-	sx := edge.From().Longitude() * xStandardizer
-	sy := edge.From().Latitude() * yStandardizer
+	sx := (edge.From().Longitude() - quad.TlLon()) * xStandardizer
+	sy := (edge.From().Latitude() - quad.TlLat()) * yStandardizer
 
-	dx := edge.To().Longitude() * xStandardizer
-	dy := edge.To().Latitude() * yStandardizer
+	dx := (edge.To().Longitude() - quad.TlLon()) * xStandardizer
+	dy := (edge.To().Latitude() - quad.TlLat()) * yStandardizer
 
 	ctx.DrawLine(sx, sy, dx, dy)
 }

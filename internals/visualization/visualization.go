@@ -2,41 +2,45 @@ package visualization
 
 import (
 	"edaa/internals/interfaces"
+	"edaa/internals/types"
 	"edaa/internals/visualization/primitives"
-	"fmt"
 	"github.com/fogleman/gg"
-	"time"
 )
 
-func DrawQuad(quad interfaces.Quad) {
-	nodes := quad.Nodes()
+func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string) {
+	s,e := quad.GetNodesPos()
 
-	start := time.Now()
+	nodes := original.Nodes()[s:e]
+
 	ctx := gg.NewContext(1000, 1000)
 
-	xStandardizer := (quad.BrLon() - quad.TlLon()) * 1000
-	yStandardizer := (quad.BrLat() - quad.TlLat()) * 1000
+	//xStandardizer := 1000 / (quad.BrLon() - quad.TlLon())
+	//yStandardizer :=  1000 / (quad.BrLat() - quad.TlLat())
 
 	for _, n := range nodes {
-		//println(n.Longitude()-quad.TlLon(), xStandardizer, (n.Longitude()-quad.TlLon())*xStandardizer)
-		//println(n.Latitude()-quad.TlLat(), yStandardizer, (n.Latitude()-quad.TlLat())*yStandardizer)
-		//println()
 
-		x := (n.Longitude() - quad.TlLon()) * xStandardizer
+		/*x := (n.Longitude() - quad.TlLon()) * xStandardizer
 		y := (n.Latitude() - quad.TlLat()) * yStandardizer
+
 		primitives.DrawNode(n, ctx, x, y)
 		ctx.SetRGB(0, 0, 0)
-		ctx.Fill()
+		ctx.Fill()*/
 
 		for _, e := range n.OutEdges() {
-			primitives.DrawEdge(e, ctx, quad)
+			if e.EdgeType() == types.Road {
+				primitives.DrawEdge(e, ctx, quad)
+			}
 		}
-
-		ctx.SetRGB(1, 0, 0)
-		ctx.Fill()
+		ctx.SetRGB(0, 0, 0)
+		ctx.Stroke()
+		for _, e := range n.InEdges() {
+			if e.EdgeType() == types.Road {
+				primitives.DrawEdge(e, ctx, quad)
+			}
+		}
+		ctx.SetRGB(0, 0, 0)
+		ctx.Stroke()
 	}
 
-	ctx.SavePNG("out.png")
-
-	fmt.Println(time.Since(start).Milliseconds())
+	ctx.SavePNG("images/"+name+".png")
 }

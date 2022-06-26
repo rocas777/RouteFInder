@@ -3,9 +3,11 @@ package quadtree
 import (
 	"edaa/internals/interfaces"
 	"edaa/internals/visualization"
+	tile_server "edaa/internals/visualization/tile-server"
 	"fmt"
 	"math"
 	"runtime"
+	"sync"
 )
 
 func NewQuadTree(g interfaces.Graph) *QuadTree {
@@ -43,25 +45,65 @@ func NewQuadTree(g interfaces.Graph) *QuadTree {
 		brLon: bottom_right_lon,
 	}
 
-	sortInQuad(g, q, 0, 0)
+	_,q.nodes = sortInQuad(g, q, 0, 0)
 
 	PrintMemUsage()
-	//println("pois")
-	nq := q.nw
 
-	visualization.DrawQuad(nq)
+	oq := q.sw.nw.ne
+
+	var wg sync.WaitGroup
+
+	nq := oq.nw
+	wg.Add(1)
+	go func(nq interfaces.Quad) {
+		visualization.DrawQuad(nq,q,"nw")
+		defer wg.Done()
+	}(nq)
+
+	nq = oq.ne
+	wg.Add(1)
+	go func(nq interfaces.Quad) {
+		visualization.DrawQuad(nq,q,"ne")
+		defer wg.Done()
+	}(nq)
+
+	nq = oq.sw
+	wg.Add(1)
+	go func(nq interfaces.Quad) {
+		visualization.DrawQuad(nq,q,"sw")
+		defer wg.Done()
+	}(nq)
+
+	nq = oq.se
+	wg.Add(1)
+	go func(nq interfaces.Quad) {
+		visualization.DrawQuad(nq,q,"se")
+		defer wg.Done()
+	}(nq)
+
+	wg.Wait()
+
+	tile_server.TileServer(q)
 
 	return &QuadTree{}
 }
 
 var i = 0
 
-func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) int {
+func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) (int,[]interfaces.Node) {
 	if q.nodes == nil {
-		return 0
+		q.start = init
+		q.end = init
+		return 0,[]interfaces.Node{}
 	}
 	if len(q.nodes) == 1 {
-		return 1
+		n := q.nodes[0]
+
+		q.start = init
+		q.end = init+1
+
+		q.nodes = nil
+		return 1,[]interfaces.Node{n}
 	}
 
 	//println(depth, q.tlLat-q.brLat, q.tlLon-q.brLon)
@@ -76,39 +118,40 @@ func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) int {
 
 	for _, n := range q.nodes {
 		if isNw(n.Latitude(), n.Longitude(), mLat, mLon) {
-			//fmt.Println("NW", n.Latitude(), n.Longitude(), mLat, mLon)
 			q.nw.nodes = append(q.nw.nodes, n)
 		} else if isNe(n.Latitude(), n.Longitude(), mLat, mLon) {
-			//fmt.Println("NE", n.Latitude(), n.Longitude(), mLat, mLon)
 			q.ne.nodes = append(q.ne.nodes, n)
 		} else if isSw(n.Latitude(), n.Longitude(), mLat, mLon) {
-			//fmt.Println("SW", n.Latitude(), n.Longitude(), mLat, mLon)
 			q.sw.nodes = append(q.sw.nodes, n)
 		} else if isSe(n.Latitude(), n.Longitude(), mLat, mLon) {
-			//fmt.Println("SE", n.Latitude(), n.Longitude(), mLat, mLon)
 			q.se.nodes = append(q.se.nodes, n)
 		}
-		//return
 	}
 
-	if depth < 17 {
+
+	if depth < 18 {
 		q.nodes = nil
-		adder := sortInQuad(g, q.nw, depth+1, init)
-		//fmt.Println(adder)
-		adder += sortInQuad(g, q.ne, depth+1, init+adder)
-		//fmt.Println(adder)
-		adder += sortInQuad(g, q.sw, depth+1, init+adder)
-		//fmt.Println(adder)
-		adder += sortInQuad(g, q.se, depth+1, init+adder)
-		//fmt.Println(adder)
-		//println()
+
+		adder1,ln1 := sortInQuad(g, q.nw, depth+1, init)
+		adder2,ln2 := sortInQuad(g, q.ne, depth+1, init+adder1)
+		adder3,ln3 := sortInQuad(g, q.sw, depth+1, init+adder1+adder2)
+		adder4,ln4 := sortInQuad(g, q.se, depth+1, init+adder1+adder2+adder3)
+
 		q.start = init
-		q.end = init + adder
-		return adder
-	} else {
+		q.end = init + adder1+adder2+adder3+adder4
+
+		n := append(append(append(ln1, ln2...), ln3...), ln4...)
+
+		return adder1+adder2+adder3+adder4,n
+	}else{
+
 		q.start = init
-		q.end = init
-		return len(q.nodes)
+		q.end = init + len(q.nodes)
+
+		n := make([]interfaces.Node,len(q.nodes))
+		copy(n,q.nodes)
+		q.nodes = nil
+		return len(q.nodes),n
 	}
 }
 
@@ -130,6 +173,7 @@ func isSe(lat, lon, mLat, mLon float64) bool {
 
 func PrintMemUsage() {
 	var m runtime.MemStats
+	runtime.GC()
 	runtime.ReadMemStats(&m)
 	// For info on each, see: https://golang.org/pkg/runtime/#MemStats
 	fmt.Printf("Alloc = %v MiB", bToMb(m.Alloc))
@@ -141,3 +185,4 @@ func PrintMemUsage() {
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }
+

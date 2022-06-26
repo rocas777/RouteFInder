@@ -7,6 +7,7 @@ type Quad interface {
 	SE() Quad
 
 	Nodes() []Node
+	GetNodesPos() (int,int)
 
 	TlLat() float64
 	TlLon() float64
