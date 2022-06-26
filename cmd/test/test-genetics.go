@@ -42,7 +42,7 @@ func main() {
 	for i := 0; i < 100; i++ {
 		select {
 		case r := <-c:
-			fmt.Println(i)
+			fmt.Println(i,r)
 			if r == 0 {
 				bad++
 			}

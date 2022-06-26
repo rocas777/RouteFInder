@@ -20,6 +20,8 @@ type solution struct {
 func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree) ([]interfaces.Edge, float64, int) {
 	//initTime := time.Now()
 
+	bp, _, _ := GetBestSolution(g, start, end)
+	a := cost(bp)
 	middleStopLat := (start.Latitude() + end.Latitude()) / 2
 	middleStopLon := (start.Longitude() + end.Longitude()) / 2
 
@@ -34,7 +36,7 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	tn, _ := kdtree.GetClosest(graph.NewNormalNode(thirdStopLat, thirdStopLon, "", "", ""))
 
 	w := 10.0
-	p1, t1, _ := GetSolution(g, start, mn, w)
+	p1, _, _ := GetSolution(g, start, mn, w)
 	p2, _, _ := GetSolution(g, mn, end, w)
 
 	p11, _, _ := GetSolution(g, start, fn, w)
@@ -43,25 +45,38 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	p21, _, _ := GetSolution(g, mn, tn, w)
 	p22, _, _ := GetSolution(g, tn, end, w)
 
-	path1 := append(p1, p2...)
+	path1 := make([]interfaces.Edge,0)
+	path1 = append(path1, p1...)
+	path1 = append(path1,p2...)
 	sol1 := solution{
 		path:   path1,
 		weight: cost(path1),
 	}
 
-	path2 := append(append(p1, p21...), p22...)
+
+	path2 := make([]interfaces.Edge,0)
+	path2 = append(path2, p1...)
+	path2 = append(path2,p21...)
+	path2 = append(path2,p22...)
 	sol2 := solution{
 		path:   path2,
 		weight: cost(path2),
 	}
 
-	path3 := append(append(p11, p12...), p2...)
+	path3 := make([]interfaces.Edge,0)
+	path3 = append(path3, p11...)
+	path3 = append(path3,p12...)
+	path3 = append(path3,p2...)
 	sol3 := solution{
 		path:   path3,
 		weight: cost(path3),
 	}
 
-	path4 := append(append(append(p11, p12...), p21...), p22...)
+	path4 := make([]interfaces.Edge,0)
+	path4 = append(path4, p11...)
+	path4 = append(path4,p12...)
+	path4 = append(path4,p21...)
+	path4 = append(path4,p22...)
 	sol4 := solution{
 		path:   path4,
 		weight: cost(path4),
@@ -90,6 +105,14 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 			}
 		}
 		sol, bv = geneticPass(g, sol, bv)
+		for _, s := range sol {
+			if s.path[len(s.path)-1].To().Id() != end.Id(){
+				panic("QUIIII!")
+			}
+			/*if a > bv{
+				panic("ooo")
+			}*/
+		}
 	}
 
 	//fmt.Println()
@@ -99,15 +122,14 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 	//fmt.Println(time.Since(initTime))
 
 	//initTime = time.Now()
-	bp, _, _ := GetBestSolution(g, start, end)
 
 	//fmt.Println()
 	//fmt.Println("Optimal:")
-	//fmt.Println("Best Result:", cost(bp))
+	//fmt.Println("Best Result:", a)
 	//fmt.Println(start.Id(), end.Id())
 	//fmt.Println(time.Since(initTime))
 
-	return p1, t1, checkBitSetVar(sol[0].path[len(sol[0].path)-1].To().Id() == end.Id() && cost(bp) <= bv)
+	return sol[0].path, bv, checkBitSetVar(sol[0].path[len(sol[0].path)-1].To().Id() == end.Id() && a <= bv)
 }
 
 func checkBitSetVar(mybool bool) int {
@@ -204,7 +226,9 @@ func getChild(m solution, f solution) solution {
 
 	for i := len(f.path) - 1; i >= 0; i-- {
 		if v, ok := mNodes[f.path[i].From().Id()]; ok {
-			out.path = append(m.path[:v+1], f.path[i:]...)
+			out.path = make([]interfaces.Edge,0)
+			out.path = append(out.path,m.path[:v+1]...)
+			out.path = append(out.path,f.path[i:]...)
 			break
 		}
 	}
@@ -245,6 +269,11 @@ func GetBestSolution(g interfaces.Graph, start interfaces.Node, end interfaces.N
 }
 
 func mutate(g interfaces.Graph, sol *solution) {
+	bf := sol.path[0].From().Id()
+	bt := sol.path[len(sol.path)-1].To().Id()
+
+	pi := len(sol.path)
+
 	p1 := rand.Intn(len(sol.path))
 	p2 := getRandDiff(p1, len(sol.path))
 
@@ -264,9 +293,24 @@ func mutate(g interfaces.Graph, sol *solution) {
 	w = w * 10
 	nP, _, _ := GetSolution(g, sol.path[p1].To(), sol.path[p2].From(), w)
 
+	if len(nP) == 0 {
+		return
+	}
+
 	temp := make([]interfaces.Edge, len(sol.path))
 	copy(temp, sol.path)
 
-	sol.path = append(append(temp[:p1+1], nP...), temp[p2:]...)
+	sol.path = make([]interfaces.Edge,0)
+	sol.path = append(sol.path,temp[:p1+1]...)
+	sol.path = append(sol.path,nP...)
+	sol.path = append(sol.path,temp[p2:]...)
 	sol.weight = cost(sol.path)
+
+	ef := sol.path[0].From().Id()
+	et := sol.path[len(sol.path)-1].To().Id()
+
+	if ef != bf || et != bt {
+		println(pi)
+		panic("")
+	}
 }

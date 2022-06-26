@@ -14,8 +14,8 @@ func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string,path []
 
 	ctx := gg.NewContext(1000, 1000)
 
-	//xStandardizer := 1000 / (quad.BrLon() - quad.TlLon())
-	//yStandardizer :=  1000 / (quad.BrLat() - quad.TlLat())
+	xStandardizer := 1000 / (quad.BrLon() - quad.TlLon())
+	yStandardizer :=  1000 / (quad.BrLat() - quad.TlLat())
 
 	for _, n := range nodes {
 
@@ -44,6 +44,24 @@ func DrawQuad(quad interfaces.Quad, original interfaces.Quad,name string,path []
 
 
 	}
+
+	sN := path[0].From()
+	EN := path[len(path)-1].To()
+
+	x := (sN.Longitude() - quad.TlLon()) * xStandardizer
+	y := (sN.Latitude() - quad.TlLat()) * yStandardizer
+	primitives.DrawNodeI(sN, ctx, x, y)
+	primitives.DrawNodeI(sN, ctx, x, y)
+
+	x = (EN.Longitude() - quad.TlLon()) * xStandardizer
+	y = (EN.Latitude() - quad.TlLat()) * yStandardizer
+	primitives.DrawNodeI(EN, ctx, x, y)
+	primitives.DrawNodeI(EN, ctx, x, y)
+
+
+	ctx.SetRGB(1, 1, 0)
+	ctx.Fill()
+
 	for _, e := range path {
 		primitives.DrawEdge(e, ctx, quad)
 	}
