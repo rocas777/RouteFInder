@@ -31,8 +31,8 @@ func GeneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node,
 func _geneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node, kdtree *kdtree2.KDTree,cost func([]interfaces.Edge) float64) ([]interfaces.Edge, float64, int) {
 	//initTime := time.Now()
 
-	bp, _, _ := GetBestSolution(g, start, end)
-	a := cost(bp)
+	/*bp, _, _ := GetBestSolution(g, start, end)
+	a := cost(bp)*/
 	middleStopLat := (start.Latitude() + end.Latitude()) / 2
 	middleStopLon := (start.Longitude() + end.Longitude()) / 2
 
@@ -155,15 +155,14 @@ func _geneticPath(g interfaces.Graph, start interfaces.Node, end interfaces.Node
 			b = c
 		}
 	}
-
-	return sol[pos].path, bv, checkBitSetVar(sol[pos].path[len(sol[pos].path)-1].To().Id() == end.Id() && a <= bv)
+	return sol[pos].path, bv, checkBitSetVar(sol[pos].path[len(sol[pos].path)-1].To().Id() == end.Id())
 }
 
 func checkBitSetVar(mybool bool) int {
 	if mybool {
 		return 1
 	}
-	return 0 //you just saved youself an else here!
+	return 0 //you just saved yourself an else here!
 }
 
 func getRandDiff(diff int, limit int) int {

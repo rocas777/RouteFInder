@@ -6,6 +6,13 @@
 </head>
 <body>
 <div id="map" style="height: 600px;margin: auto"></div>
+<div>
+    <button id="d">Dijkstra</button>
+    <button id="a">AStar</button>
+    <button id="alt">ALT</button>
+    <button id="gt">Genetic Time</button>
+    <button id="gp">Genetic Price</button>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
@@ -15,11 +22,94 @@
       integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
       crossorigin=""/>
 <script>
-    var map = L.map('map').setView([51.505, -0.09], 1);
-    L.tileLayer('http://localhost:8000/{z}/{x}/{y}.png', {
+    let map = L.map('map').setView([51.505, -0.09], 1);
+    let tiles = L.tileLayer('http://localhost:8000/{z}/{x}/{y}.png', {
         maxZoom: 6,
         attribution: '© OpenStreetMap',
     }).addTo(map);
+
+    let first = null
+    let last = null
+
+    let firstPoint = null
+    let lastPoint = null
+    let LeafIcon = L.Icon.extend({
+        options: {
+            iconSize:     [38, 95],
+            shadowSize:   [50, 64],
+            iconAnchor:   [22, 94],
+            shadowAnchor: [4, 62],
+            popupAnchor:  [-3, -76]
+        }
+    })
+    let redIcon = new LeafIcon({
+        iconUrl: 'img/red.png',
+    })
+    let greenIcon = new LeafIcon({
+        iconUrl: 'img/green.png',
+    })
+    map.on('click', function(e) {
+        var popLocation= e.latlng;
+        console.log(e.latlng)
+        if (first != null && last != null){
+            first = null
+            last = null
+            map.removeLayer(firstPoint);
+            map.removeLayer(lastPoint);
+        }
+        if (first == null){
+            first = e.latlng
+            firstPoint =  L.marker(first, {icon: greenIcon})
+                .addTo(map)
+                .bindPopup("Start");
+        }
+        else if (last == null){
+            last = e.latlng
+            lastPoint =  L.marker(last, {icon: redIcon})
+                .addTo(map)
+                .bindPopup("Destination");
+        }
+    });
+
+    function sendRequest(coordsS,coordsD,method){
+        var myHeaders = new Headers();
+
+        var myInit = { method: 'GET',
+            headers: myHeaders,
+            mode: 'no-cors',
+            cache: 'default' };
+
+        console.log(coordsS,coordsD)
+        fetch('http://localhost:8081/?method='+method+'&slat='+coordsS.lat+"&slon="+coordsS.lng+"&dlat="+coordsD.lat+"&dlon="+coordsD.lng,myInit).then(()=>{
+
+            tiles.redraw();
+        });
+    }
+
+    let d = document.getElementById("d")
+    let a = document.getElementById("a")
+    let alt = document.getElementById("alt")
+    let gt = document.getElementById("gt")
+    let gp = document.getElementById("gp")
+
+    register_button(d,"d")
+    register_button(a,"a")
+    register_button(alt,"alt")
+    register_button(gt,"gt")
+    register_button(gp,"gp")
+
+    function register_button(elem,method){
+        if (elem){
+            elem.addEventListener("click",() =>{
+                if (first == null || last == null){
+                    alert("Please Select the Start and Ending Points")
+                }
+                sendRequest(first,last,method)
+            })
+        }
+    }
+
+
 </script>
 </body>
 </html>

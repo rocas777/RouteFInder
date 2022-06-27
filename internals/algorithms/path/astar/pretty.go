@@ -12,7 +12,7 @@ func PreetyDisplay(path []interfaces.Edge, pathTime float64, explored int, start
 	fmt.Println("")
 	fmt.Println("")
 
-	p,pathTime := costCostNoPenalty(path)
+	p,pathTime := CostCostNoPenalty(path)
 
 	roadTime := 0.0
 	busTime := 0.0
@@ -55,7 +55,7 @@ var prices map[int]float64 = map[int]float64{
 	8 : 3.65,
 	9 : 4.05,
 }
-func costCostNoPenalty(path []interfaces.Edge) (float64,float64){
+func CostCostNoPenalty(path []interfaces.Edge) (float64,float64){
 	t := 0.0
 	cost := 0.0
 	lastBus := true
@@ -69,16 +69,10 @@ func costCostNoPenalty(path []interfaces.Edge) (float64,float64){
 		}
 		if v.EdgeType() != types.Road{
 			lastBus = true;
-			t += v.Weight()
 		}else{
 			lastBus = false
-			t += v.Weight()
 		}
+		t += v.Weight()
 	}
-	/*fmt.Println(cost)
-	fmt.Println(prices[len(zones)])
-	fmt.Println(walk)
-	fmt.Println(transport)
-	fmt.Println()*/
 	return math.Min(cost,prices[len(zones)]),t
 }

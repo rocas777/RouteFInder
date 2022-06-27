@@ -6,6 +6,7 @@ import (
 	"github.com/paulmach/osm"
 	"github.com/paulmach/osm/osmpbf"
 	"os"
+	"fmt"
 	"runtime"
 )
 

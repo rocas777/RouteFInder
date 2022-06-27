@@ -10,7 +10,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 	"os/exec"
+	"strconv"
 
 	//"edaa/internals/algorithms/path/astar"
 	//"edaa/internals/g"
@@ -33,8 +35,46 @@ var first = 0
 
 var kill chan interface{}
 
+func server (){
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		sLatS := r.URL.Query()["slat"][0]
+		sLonS := r.URL.Query()["slon"][0]
+		dLatS := r.URL.Query()["dlat"][0]
+		dLonS := r.URL.Query()["dlon"][0]
+		m := r.URL.Query()["method"][0]
+
+		sLat,_ := strconv.ParseFloat(sLatS,64)
+		sLon,_ := strconv.ParseFloat(sLonS,64)
+		dLat,_ := strconv.ParseFloat(dLatS,64)
+		dLon,_ := strconv.ParseFloat(dLonS,64)
+
+		println(m)
+		switch m{
+		case "d":
+			time,cost := menuHelper.DijkstraServer(g,kdtree,sLat,sLon,dLat,dLon)
+			println(time,cost)
+		case "a":
+			time,cost := menuHelper.AStartServer(g,kdtree,sLat,sLon,dLat,dLon)
+			println(time,cost)
+		case "alt":
+			time,cost := menuHelper.ALTServer(g,kdtree,sLat,sLon,dLat,dLon,l)
+			println(time,cost)
+		case "gt":
+			time,cost := menuHelper.GeneticTimeServer(g,kdtree,sLat,sLon,dLat,dLon)
+			println(time,cost)
+		case "gp":
+			time,cost := menuHelper.GeneticPriceServer(g,kdtree,sLat,sLon,dLat,dLon)
+			println(time,cost)
+		}
+
+		//fmt.Println(sLat,sLon,dLat,dLon)
+		w.Write([]byte(""))
+	})
+	log.Fatal(http.ListenAndServe(":8081", nil))
+}
 
 func main() {
+	go server()
 	kill = make(chan interface{})
 	for {
 		fmt.Println("")

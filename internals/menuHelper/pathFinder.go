@@ -5,6 +5,7 @@ import (
 	"edaa/internals/algorithms/path/genetics"
 	"edaa/internals/algorithms/path/landmarks"
 	"edaa/internals/dataStructures/kdtree"
+	"edaa/internals/graph"
 	"edaa/internals/interfaces"
 	"edaa/internals/utils"
 	tile_server "edaa/internals/visualization/tile-server"
@@ -46,6 +47,90 @@ func PathFinder(g interfaces.Graph, tree *kdtree.KDTree) {
 	astar.ExportEdges(path)
 }
 
+func getNodes(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (interfaces.Node,interfaces.Node){
+
+
+	sn := graph.NewNormalNode(slat,slon,"","","")
+	en := graph.NewNormalNode(dlat,dlon,"","","")
+
+	startNode, _ := tree.GetClosest(sn)
+	endNode, _ := tree.GetClosest(en)
+	return startNode,endNode
+}
+
+func DijkstraServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+	tile_server.ClearPath()
+	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
+		return 0
+	})
+
+	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
+
+	path, _, _ := as.Path(startNode, endNode)
+
+	time,cost := astar.CostCostNoPenalty(path)
+	tile_server.AddPath(path)
+	return time,cost
+}
+
+func AStartServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+	tile_server.ClearPath()
+	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
+		return utils.GetDistanceBetweenNodes(from, to) / (20)
+	})
+
+	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
+
+	path, _, _ := as.Path(startNode, endNode)
+
+	time,cost := astar.CostCostNoPenalty(path)
+	tile_server.AddPath(path)
+	return time,cost
+}
+
+func ALTServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64, d *landmarks.Dijkstra) (float64,float64) {
+	tile_server.ClearPath()
+
+
+	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
+
+	activeLandmarks := d.SelectActiveLandmarks(startNode, endNode)
+
+	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
+		return landmarks.Heuristic(from, to, activeLandmarks)
+	})
+
+	path, _, _ := as.Path(startNode, endNode)
+
+	time,cost := astar.CostCostNoPenalty(path)
+	tile_server.AddPath(path)
+	return time,cost
+}
+
+func GeneticTimeServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+	tile_server.ClearPath()
+
+	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
+
+	path, _, _ := genetics.GeneticPath(g, startNode, endNode, tree,true)
+
+	time,cost := astar.CostCostNoPenalty(path)
+	tile_server.AddPath(path)
+	return time,cost
+}
+
+func GeneticPriceServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+	tile_server.ClearPath()
+
+	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
+
+	path, _, _ := genetics.GeneticPath(g, startNode, endNode, tree,false)
+
+	time,cost := astar.CostCostNoPenalty(path)
+	tile_server.AddPath(path)
+	return time,cost
+}
+
 func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
 	tile_server.ClearPath()
 
@@ -71,7 +156,7 @@ func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
 	//startNode := g.NodesMap()["metro_27"]
 	//endNode := g.NodesMap()["metro_76"]
 
-	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode, tree,false)
+	path, pathTime, explored := genetics.GeneticPath(g, startNode, endNode, tree,true)
 	println(path[len(path)-1].To().Id(),endNode.Id())
 
 	tile_server.AddPath(path)
