@@ -2,6 +2,7 @@
 ## How to run
 go run cmd/main/edaa.go
 
+Open index.html and chose option 2 on the program to use the UI
 
 
 ## List of dependencies
@@ -12,7 +13,7 @@ go run cmd/main/edaa.go
 - github.com/paulmach/osm v0.2.2
 - github.com/starwander/GoFibonacciHeap v0.0.0-20190508061137-ba2e4f01000a
 - github.com/umahmood/haversine v0.0.0-20151105152445-808ab04add26
-### To visualize the graph:
+### To visualize the graph v1:
 - NetworkX (pip install networkx)
 - MatPlotLib (pip install matplotlib)
 - Numpy (pip install numpy)
