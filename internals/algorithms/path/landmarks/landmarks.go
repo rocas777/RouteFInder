@@ -5,6 +5,7 @@ import (
 	"edaa/internals/types"
 	"fmt"
 	"math"
+	"sort"
 
 	fibHeap "github.com/starwander/GoFibonacciHeap"
 )
@@ -129,84 +130,46 @@ func NewDijkstra(graph interfaces.Graph) *Dijkstra {
 	return &Dijkstra{graph: graph, heap: fibHeap.NewFibHeap()}
 }
 
-func (d *Dijkstra) SelectActiveLandmarks(from interfaces.Node, to interfaces.Node) [4]int {
-	var active [4]int
-	var lowerLeft, lowerRight, upperLeft, upperRight bool
-
-	for i := 0; i < 12; i++ {
-		if from.Latitude() < to.Latitude() {
-			if d.lats[i] < from.Latitude() && d.lons[i] < from.Longitude() {
-				if lowerLeft && d.lats[active[0]] < d.lats[i] {
-					active[0] = i
-				} else if !lowerLeft {
-					active[0] = i
-					lowerLeft = true
-				}
-			}
-			if d.lats[i] < from.Latitude() && d.lons[i] > from.Longitude() {
-				if lowerRight && d.lats[active[1]] < d.lats[i] {
-					active[1] = i
-				} else if !lowerRight {
-					active[1] = i
-					lowerRight = true
-				}
-			}
-			if d.lats[i] > to.Latitude() && d.lons[i] < to.Longitude() {
-				if upperLeft && d.lats[active[2]] > d.lats[i] {
-					active[2] = i
-				} else if !upperLeft {
-					active[2] = i
-					upperLeft = true
-				}
-			}
-			if d.lats[i] > to.Latitude() && d.lons[i] > to.Longitude() {
-				if upperRight && d.lats[active[3]] > d.lats[i] {
-					active[3] = i
-				} else if !upperRight {
-					active[3] = i
-					upperRight = true
-				}
-			}
-		} else {
-			if d.lats[i] < to.Latitude() && d.lons[i] < to.Longitude() {
-				if lowerLeft && d.lats[active[0]] < d.lats[i] {
-					active[0] = i
-				} else if !lowerLeft {
-					active[0] = i
-					lowerLeft = true
-				}
-			}
-			if d.lats[i] < to.Latitude() && d.lons[i] > to.Longitude() {
-				if lowerRight && d.lats[active[1]] < d.lats[i] {
-					active[1] = i
-				} else if !lowerRight {
-					active[1] = i
-					lowerRight = true
-				}
-			}
-			if d.lats[i] > from.Latitude() && d.lons[i] < from.Longitude() {
-				if upperLeft && d.lats[active[2]] > d.lats[i] {
-					active[2] = i
-				} else if !upperLeft {
-					active[2] = i
-					upperLeft = true
-				}
-			}
-			if d.lats[i] > from.Latitude() && d.lons[i] > from.Longitude() {
-				if upperRight && d.lats[active[3]] > d.lats[i] {
-					active[3] = i
-				} else if !upperRight {
-					active[3] = i
-					upperRight = true
-				}
-			}
-		}
+func (d *Dijkstra) SelectActiveLandmarks(from interfaces.Node, to interfaces.Node) [3]int {
+	fromL := from.GetFromLandmarks()
+	toL := to.GetFromLandmarks()
+	
+	var active [3]int
+	
+	potentials := []struct {
+		Index int
+		Potential float64
+	}{
+		{0, math.Abs(fromL[0] - toL[0])},
+		{1, math.Abs(fromL[1] - toL[1])},
+		{2, math.Abs(fromL[2] - toL[2])},
+		{3, math.Abs(fromL[3] - toL[3])},
+		{4, math.Abs(fromL[4] - toL[4])},
+		{5, math.Abs(fromL[5] - toL[5])},
+		{6, math.Abs(fromL[6] - toL[6])},
+		{7, math.Abs(fromL[7] - toL[7])},
+		{8, math.Abs(fromL[8] - toL[8])},
+		{9, math.Abs(fromL[9] - toL[9])},
+		{10, math.Abs(fromL[10] - toL[10])},
+		{11, math.Abs(fromL[11] - toL[11])},
 	}
-	fmt.Println(active)
+	
+	fmt.Println("before sort:", potentials);
+	
+	sort.SliceStable(potentials, func(i, j int) bool {
+		return potentials[i].Potential < potentials[j].Potential;
+	});
+	fmt.Println("after sort:", potentials);
+	
+	active[0] = potentials[11].Index;
+	active[1] = potentials[10].Index;
+	active[2] = potentials[9].Index;
+	
+	fmt.Println(active);
 	return active
 }
 
-func Heuristic(from interfaces.Node, to interfaces.Node, activeLandmarks [4]int) float64 {
+func Heuristic(from interfaces.Node, to interfaces.Node, activeLandmarks [3]int) float64 {
 	fromL := from.GetFromLandmarks()
 	toL := to.GetFromLandmarks()
 
