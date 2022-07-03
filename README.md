@@ -2,6 +2,8 @@
 ## How to run
 go run cmd/main/edaa.go
 
+
+
 ## List of dependencies
 ### Go (automatically installed when executing go run):
 - github.com/gocarina/gocsv v0.0.0-20220310154401-d4df709ca055
@@ -17,3 +19,4 @@ go run cmd/main/edaa.go
 
 ## How to see the graph without using the menu
 python networkx/view.py
+

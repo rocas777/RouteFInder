@@ -216,6 +216,9 @@ func main() {
 					MLon = node.Latitude()
 				}
 			}
+			if kdtree == nil {
+				kdtree = kdtree2.NewKDTree(g)
+			}
 			if quadtree == nil {
 				quadtree = quadtree2.NewQuadTree(g)
 				go restartServer()
