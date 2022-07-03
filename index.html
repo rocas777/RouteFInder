@@ -5,13 +5,37 @@
     <title>Best Project on this Subject Ever!</title>
 </head>
 <body>
-<div id="map" style="height: 600px;margin: auto"></div>
 <div>
-    <button id="d">Dijkstra</button>
-    <button id="a">AStar</button>
-    <button id="alt">ALT</button>
-    <button id="gt">Genetic Time</button>
-    <button id="gp">Genetic Price</button>
+    <span style="background-color: #ff0000">WALK</span>
+    <span style="background-color: #0000ff">METRO</span>
+    <span style="background-color: #00ff00">BUS</span>
+</div>
+<div id="map" style="height: 600px;width: 80%; margin-left: 0"></div>
+<div style="display: flex;margin: auto">
+    <div>
+        <div>
+        Fastest:
+            <button id="d">Dijkstra</button>
+            <button id="a">AStar</button>
+            <button id="alt">ALT</button>
+            <button id="gt">Genetic Time</button>
+        </div>
+        <div style="margin-top: 10px">
+            Cheapest:
+            <button id="gp">Genetic Price</button>
+        </div>
+    </div>
+    <div style="display: flex;margin: auto;flex-direction: column">
+        <div>
+            Price: <span id="price"></span>€
+        </div>
+        <div>
+            Time: <span id="time"></span>
+        </div>
+        <div>
+            Alg Time: <span id="alg_time"></span>ms
+        </div>
+    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
@@ -22,9 +46,9 @@
       integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
       crossorigin=""/>
 <script>
-    let map = L.map('map').setView([51.505, -0.09], 1);
+    let map = L.map('map').setView([38.02503, -8.558739], 12);
     let tiles = L.tileLayer('http://localhost:8000/{z}/{x}/{y}.png', {
-        maxZoom: 6,
+        maxZoom: 20,
         attribution: '© OpenStreetMap',
     }).addTo(map);
 
@@ -76,14 +100,18 @@
 
         var myInit = { method: 'GET',
             headers: myHeaders,
-            mode: 'no-cors',
             cache: 'default' };
 
         console.log(coordsS,coordsD)
-        fetch('http://localhost:8081/?method='+method+'&slat='+coordsS.lat+"&slon="+coordsS.lng+"&dlat="+coordsD.lat+"&dlon="+coordsD.lng,myInit).then(()=>{
-
-            tiles.redraw();
-        });
+        fetch('http://localhost:8081/?method='+method+'&slat='+coordsS.lat+"&slon="+coordsS.lng+"&dlat="+coordsD.lat+"&dlon="+coordsD.lng,myInit)
+        .then((response) => {
+            return response.json()
+        }).then((response)=>{
+            sessionStorage.setItem("price",response["price"])
+            sessionStorage.setItem("time",response["time"])
+            sessionStorage.setItem("alg_time",response["alg_time"])
+            location.reload()
+        })
     }
 
     let d = document.getElementById("d")
@@ -91,6 +119,16 @@
     let alt = document.getElementById("alt")
     let gt = document.getElementById("gt")
     let gp = document.getElementById("gp")
+
+
+    let price = document.getElementById("price")
+    let time = document.getElementById("time")
+    let alg_time = document.getElementById("alg_time")
+
+
+    load_labels("price",price)
+    load_labels("time",time)
+    load_labels("alg_time",alg_time)
 
     register_button(d,"d")
     register_button(a,"a")
@@ -107,6 +145,33 @@
                 sendRequest(first,last,method)
             })
         }
+    }
+
+    function load_labels(key,elem){
+            elem.innerText = sessionStorage.getItem(key)
+    }
+
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+    function eraseCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
 
 

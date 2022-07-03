@@ -3,20 +3,19 @@ package quadtree
 import (
 	"edaa/internals/interfaces"
 	"fmt"
-	"math"
 	"runtime"
 )
 
 func NewQuadTree(g interfaces.Graph) *QuadTree {
 	PrintMemUsage()
 
-	top_left_lat := -math.Inf(1)
-	top_left_lon := math.Inf(1)
+	top_left_lat := 180.0
+	top_left_lon := -180.0
 
-	bottom_right_lat := math.Inf(1)
-	bottom_right_lon := -math.Inf(1)
+	bottom_right_lat := -180.0
+	bottom_right_lon := 180.0
 
-	for _, n := range g.Nodes() {
+	/*for _, n := range g.Nodes() {
 		if top_left_lat < n.Latitude() {
 			top_left_lat = n.Latitude()
 		}
@@ -29,7 +28,7 @@ func NewQuadTree(g interfaces.Graph) *QuadTree {
 		if bottom_right_lon < n.Longitude() {
 			bottom_right_lon = n.Longitude()
 		}
-	}
+	}*/
 
 	//fmt.Println(top_left_lat, top_left_lon)
 	//fmt.Println(bottom_right_lat, bottom_right_lon)
@@ -90,7 +89,7 @@ func sortInQuad(g interfaces.Graph, q *quad, depth int, init int) (int,[]interfa
 	}
 
 
-	if depth < 18 {
+	if depth < 30 {
 		q.nodes = nil
 
 		adder1,ln1 := sortInQuad(g, q.nw, depth+1, init)

@@ -58,7 +58,7 @@ func getNodes(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon fl
 	return startNode,endNode
 }
 
-func DijkstraServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+func DijkstraServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64,[]interfaces.Edge) {
 	tile_server.ClearPath()
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
 		return 0
@@ -68,12 +68,12 @@ func DijkstraServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, d
 
 	path, _, _ := as.Path(startNode, endNode)
 
-	time,cost := astar.CostCostNoPenalty(path)
+	cost,time := astar.CostCostNoPenalty(path)
 	tile_server.AddPath(path)
-	return time,cost
+	return time,cost,path
 }
 
-func AStartServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+func AStartServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64,[]interfaces.Edge) {
 	tile_server.ClearPath()
 	as := astar.NewAstar(g, func(from interfaces.Node, to interfaces.Node) float64 {
 		return utils.GetDistanceBetweenNodes(from, to) / (20)
@@ -85,10 +85,10 @@ func AStartServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlo
 
 	time,cost := astar.CostCostNoPenalty(path)
 	tile_server.AddPath(path)
-	return time,cost
+	return time,cost,path
 }
 
-func ALTServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64, d *landmarks.Dijkstra) (float64,float64) {
+func ALTServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64, d *landmarks.Dijkstra) (float64,float64,[]interfaces.Edge) {
 	tile_server.ClearPath()
 
 
@@ -104,10 +104,10 @@ func ALTServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon f
 
 	time,cost := astar.CostCostNoPenalty(path)
 	tile_server.AddPath(path)
-	return time,cost
+	return time,cost,path
 }
 
-func GeneticTimeServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+func GeneticTimeServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64,[]interfaces.Edge) {
 	tile_server.ClearPath()
 
 	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
@@ -116,10 +116,10 @@ func GeneticTimeServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat
 
 	time,cost := astar.CostCostNoPenalty(path)
 	tile_server.AddPath(path)
-	return time,cost
+	return time,cost,path
 }
 
-func GeneticPriceServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64) {
+func GeneticPriceServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dlat, dlon float64) (float64,float64,[]interfaces.Edge) {
 	tile_server.ClearPath()
 
 	startNode,endNode := getNodes(g , tree, slat, slon, dlat, dlon)
@@ -128,7 +128,7 @@ func GeneticPriceServer(g interfaces.Graph, tree *kdtree.KDTree, slat, slon, dla
 
 	time,cost := astar.CostCostNoPenalty(path)
 	tile_server.AddPath(path)
-	return time,cost
+	return time,cost,path
 }
 
 func PathFinderGenetics(g interfaces.Graph, tree *kdtree.KDTree) {
