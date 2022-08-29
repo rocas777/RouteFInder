@@ -3,6 +3,8 @@
 Program to find a Multimodal path on the city of Porto
 
 ![image](https://user-images.githubusercontent.com/28635230/187101672-5e259f66-54c5-4502-b1b8-2bbdff820355.png)
+![image](https://user-images.githubusercontent.com/28635230/187101700-15952dfd-2b41-4f0d-bbda-9bac6de2a8cd.png)
+![image](https://user-images.githubusercontent.com/28635230/187101726-bd46e597-7bb9-4ffe-87e7-a6cc6fab2f9c.png)
 
 
 ## How to run
