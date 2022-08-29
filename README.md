@@ -1,9 +1,17 @@
 # FEUP-EDAA
+
+Program to find a Multimodal path on the city of Porto
+
 ## How to run
 go run cmd/main/edaa.go
 
 Open index.html and chose option 2 on the program to use the UI
 
+
+## Implemented ALgorithms
+- A* for Shortest Path
+- ALT for Shortest path
+- Genetic Algorithm for Shortest and Cheapest Path
 
 ## List of dependencies
 ### Go (automatically installed when executing go run):
