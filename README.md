@@ -2,6 +2,9 @@
 
 Program to find a Multimodal path on the city of Porto
 
+![image](https://user-images.githubusercontent.com/28635230/187101672-5e259f66-54c5-4502-b1b8-2bbdff820355.png)
+
+
 ## How to run
 go run cmd/main/edaa.go
 
