@@ -3,7 +3,10 @@ package graph
 import (
 	"edaa/internals/interfaces"
 	"edaa/internals/utils"
+	"encoding/xml"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"regexp/syntax"
 	"time"
 )
@@ -94,6 +97,68 @@ func (g *Graph) MinLon() float64 {
 
 func (g *Graph) SetMinLon(minLon float64) {
 	g.minLon = minLon
+}
+
+func (g *Graph) InitOnlyRoads() {
+	g.nodesMap = make(map[string]interfaces.Node)
+	g.walkableNodes = make(map[string]interfaces.Node)
+	g.busableNodes = make(map[string]interfaces.Node)
+	g.metroableNodes = make(map[string]interfaces.Node)
+
+	start := time.Now()
+
+	helperMap := make(map[string]interfaces.Node)
+	in, err := os.Open("compressed.xml")
+	if err != nil {
+		panic(err)
+	}
+	defer func(in *os.File) {
+		err := in.Close()
+		if err != nil {
+			panic(err.Error())
+		}
+	}(in)
+	roadsData, _ := ioutil.ReadAll(in)
+	var osm osm
+	if err := xml.Unmarshal(roadsData, &osm); err != nil {
+		panic(err)
+	}
+
+	for _, node := range osm.Nodes {
+		helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
+	}
+	for _, way := range osm.Ways {
+		isTwoWay := true
+		for _, tag := range way.Tags {
+			if tag.Key == "oneway" && tag.Value == "yes" {
+				isTwoWay = false
+				break
+			}
+		}
+		var lastNode interfaces.Node
+		for _, node := range way.Nodes {
+			currentNode := helperMap[node.Ref]
+			if lastNode == nil {
+				lastNode = currentNode
+			} else {
+				dist := utils.GetDistance(lastNode.Latitude(), lastNode.Longitude(), currentNode.Latitude(), currentNode.Longitude()) / walkSpeed
+				lastNode.AddDestination(currentNode, dist)
+				if isTwoWay {
+					currentNode.AddDestination(lastNode, dist)
+				}
+				lastNode = currentNode
+			}
+		}
+	}
+	for _, node := range helperMap {
+		g.AddNode(node)
+		g.WalkableNodes()[node.Id()] = node
+	}
+
+	fmt.Println("Roads+Metro+Bus size:", len(g.nodes))
+
+	elapsed := time.Since(start)
+	fmt.Printf("Roads initiation %s\n\n", elapsed)
 }
 
 func (g *Graph) Init() {

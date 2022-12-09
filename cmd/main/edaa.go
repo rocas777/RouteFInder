@@ -25,9 +25,9 @@ import (
 	//"edaa/internals/utils"
 	//"time"
 	"bufio"
+	"github.com/gin-gonic/gin"
 	"os"
 	"strings"
-	"github.com/gin-gonic/gin"
 )
 
 var g interfaces.Graph
@@ -44,7 +44,7 @@ var first = 0
 
 var kill chan interface{}
 
-func server (){
+func server() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.GET("/", func(c *gin.Context) {
@@ -59,10 +59,10 @@ func server (){
 		dLonS := c.Request.URL.Query()["dlon"][0]
 		m := c.Request.URL.Query()["method"][0]
 
-		sLat,_ := strconv.ParseFloat(sLatS,64)
-		sLon,_ := strconv.ParseFloat(sLonS,64)
-		dLat,_ := strconv.ParseFloat(dLatS,64)
-		dLon,_ := strconv.ParseFloat(dLonS,64)
+		sLat, _ := strconv.ParseFloat(sLatS, 64)
+		sLon, _ := strconv.ParseFloat(sLonS, 64)
+		dLat, _ := strconv.ParseFloat(dLatS, 64)
+		dLon, _ := strconv.ParseFloat(dLonS, 64)
 
 		top := 38.194482
 		bottom := 37.95421
@@ -72,9 +72,8 @@ func server (){
 		pS := (sLat - bottom) / (top - bottom)
 		pD := (dLat - bottom) / (top - bottom)
 
-		sLat = bottomR + (topR-bottomR) * pS
-		dLat = bottomR + (topR-bottomR) * pD
-
+		sLat = bottomR + (topR-bottomR)*pS
+		dLat = bottomR + (topR-bottomR)*pD
 
 		var time float64
 		var cost float64
@@ -82,78 +81,78 @@ func server (){
 
 		start := time2.Now()
 
-		switch m{
+		switch m {
 		case "d":
-			time,cost,path = menuHelper.DijkstraServer(g,kdtree,sLat,sLon,dLat,dLon)
-			fmt.Println("Price:",cost)
+			time, cost, path = menuHelper.DijkstraServer(g, kdtree, sLat, sLon, dLat, dLon)
+			fmt.Println("Price:", cost)
 			pathTime := time
 			fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
-			fmt.Println("Alg Time:",time2.Since(start).Milliseconds())
+			fmt.Println("Alg Time:", time2.Since(start).Milliseconds())
 		case "a":
-			time,cost,path = menuHelper.AStartServer(g,kdtree,sLat,sLon,dLat,dLon)
+			time, cost, path = menuHelper.AStartServer(g, kdtree, sLat, sLon, dLat, dLon)
 			t := time
 			time = cost
 			cost = t
-			fmt.Println("Price:",cost)
+			fmt.Println("Price:", cost)
 			pathTime := time
 			fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
-			fmt.Println("Alg Time:",time2.Since(start).Milliseconds())
+			fmt.Println("Alg Time:", time2.Since(start).Milliseconds())
 		case "alt":
-			time,cost,path = menuHelper.ALTServer(g,kdtree,sLat,sLon,dLat,dLon,l)
+			time, cost, path = menuHelper.ALTServer(g, kdtree, sLat, sLon, dLat, dLon, l)
 			t := time
 			time = cost
 			cost = t
-			fmt.Println("Price:",cost)
+			fmt.Println("Price:", cost)
 			pathTime := time
 			fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
-			fmt.Println("Alg Time:",time2.Since(start).Milliseconds())
+			fmt.Println("Alg Time:", time2.Since(start).Milliseconds())
 		case "gt":
-			time,cost,path = menuHelper.GeneticTimeServer(g,kdtree,sLat,sLon,dLat,dLon)
+			time, cost, path = menuHelper.GeneticTimeServer(g, kdtree, sLat, sLon, dLat, dLon)
 			t := time
 			time = cost
 			cost = t
-			fmt.Println("Price:",cost,"€")
+			fmt.Println("Price:", cost, "€")
 			pathTime := time
 			fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
-			fmt.Println("Alg Time:",time2.Since(start).Milliseconds(),"ms")
+			fmt.Println("Alg Time:", time2.Since(start).Milliseconds(), "ms")
 		case "gp":
-			time,cost,path = menuHelper.GeneticPriceServer(g,kdtree,sLat,sLon,dLat,dLon)
+			time, cost, path = menuHelper.GeneticPriceServer(g, kdtree, sLat, sLon, dLat, dLon)
 			t := time
 			time = cost
 			cost = t
-			fmt.Println("Price:",cost)
+			fmt.Println("Price:", cost)
 			pathTime := time
 			fmt.Printf("Time: %d:%d\n", int(pathTime/60), int((pathTime/60-math.Floor(pathTime/60))*60))
-			fmt.Println("Alg Time:",time2.Since(start).Milliseconds())
+			fmt.Println("Alg Time:", time2.Since(start).Milliseconds())
 		}
 
 		GetLegs(path)
 
-		c.JSON(http.StatusOK, gin.H{"price":cost,"time":fmt.Sprintf("Time: %d:%d\n", int(time/60), int((time/60-math.Floor(time/60))*60)),"alg_time":time2.Since(start).Milliseconds()})
+		c.JSON(http.StatusOK, gin.H{"price": cost, "time": fmt.Sprintf("Time: %d:%d\n", int(time/60), int((time/60-math.Floor(time/60))*60)), "alg_time": time2.Since(start).Milliseconds()})
 
 	})
-	r.Run(":8081")
+	r.Run(":8085")
 }
 
 type leg struct {
-	start string
-	end string
+	start  string
+	end    string
 	method string
 }
 
-func GetLegs(path []interfaces.Edge)  {
+func GetLegs(path []interfaces.Edge) {
 	out := []leg{}
 	var last types.EdgeType = types.Road
 	var lastNode string = ""
 	for _, edge := range path {
-		if last != edge.EdgeType(){
+		if last != edge.EdgeType() {
 
 			edgeT := ""
-			if edge.EdgeType() == types.Road{
+			if edge.EdgeType() == types.Road {
 				edgeT = "Walk"
-			}else if edge.EdgeType() == types.Metro{
+			} else if edge.EdgeType() == types.Metro {
 				edgeT = "Metro"
-			}else if edge.EdgeType() == types.Bus{
+			} else if edge.EdgeType() == types.Bus {
 				edgeT = "Bus"
 			}
 
@@ -190,7 +189,6 @@ func main() {
 		opt, _ := reader.ReadString('\n')
 		opt = strings.TrimSpace(opt)
 
-
 		switch opt {
 		case "1":
 			g = &graph.Graph{}
@@ -203,16 +201,16 @@ func main() {
 				fmt.Println("Could not load, file does not exist")
 			}
 			for _, node := range g.Nodes() {
-				if node.Latitude() < mLat{
+				if node.Latitude() < mLat {
 					mLat = node.Latitude()
 				}
-				if node.Latitude() > MLat{
+				if node.Latitude() > MLat {
 					MLat = node.Latitude()
 				}
-				if node.Longitude() < mLon{
+				if node.Longitude() < mLon {
 					mLon = node.Latitude()
 				}
-				if node.Longitude() > MLon{
+				if node.Longitude() > MLon {
 					MLon = node.Latitude()
 				}
 			}
@@ -243,16 +241,16 @@ func main() {
 				fmt.Println("Could not load, file does not exist")
 			}
 			for _, node := range g.Nodes() {
-				if node.Latitude() < mLat{
+				if node.Latitude() < mLat {
 					mLat = node.Latitude()
 				}
-				if node.Latitude() > MLat{
+				if node.Latitude() > MLat {
 					MLat = node.Latitude()
 				}
-				if node.Longitude() < mLon{
+				if node.Longitude() < mLon {
 					mLon = node.Latitude()
 				}
-				if node.Longitude() > MLon{
+				if node.Longitude() > MLon {
 					MLon = node.Latitude()
 				}
 			}
@@ -333,10 +331,10 @@ func main() {
 	}
 }
 
-func restartServer(){
+func restartServer() {
 	if first != 0 {
 		kill <- ""
 	}
 	first = 1
-	tile_server.TileServer(quadtree.Root,kill)
+	tile_server.TileServer(quadtree.Root, kill)
 }

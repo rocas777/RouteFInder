@@ -42,6 +42,7 @@ type osmND struct {
 }
 
 func InitRoads(g interfaces.Graph) {
+	println("Setting Road Nodes")
 	helperMap := make(map[string]interfaces.Node)
 	in, err := os.Open("data/road/compressed.xml")
 	if err != nil {
@@ -54,27 +55,15 @@ func InitRoads(g interfaces.Graph) {
 		}
 	}(in)
 	roadsData, _ := ioutil.ReadAll(in)
-	var osm osm
-	if err := xml.Unmarshal(roadsData, &osm); err != nil {
+	var osmV osm
+	if err := xml.Unmarshal(roadsData, &osmV); err != nil {
 		panic(err)
 	}
 
-	for _, node := range osm.Nodes {
-		/*isStation := false
-		for _, tag := range node.Tags {
-			if (tag.Key == "highway" && tag.Value == "bus_stop") || (tag.Key == "station" && tag.Value == "subway") {
-				isStation = true
-				break
-			}
-		}
-		if isStation {
-			//helperMap[node.ID] = NewStationNode(node.Latitude, node.Longitude, "", "", node.ID)
-		} else {
-			helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
-		}*/
+	for _, node := range osmV.Nodes {
 		helperMap[node.ID] = NewNormalNode(node.Lat, node.Lon, "", "", "walk_"+node.ID)
 	}
-	for _, way := range osm.Ways {
+	for _, way := range osmV.Ways {
 		isTwoWay := true
 		for _, tag := range way.Tags {
 			if tag.Key == "oneway" && tag.Value == "yes" {
@@ -88,7 +77,7 @@ func InitRoads(g interfaces.Graph) {
 			if lastNode == nil {
 				lastNode = currentNode
 			} else {
-				dist := utils.GetDistance(lastNode.Latitude(), lastNode.Longitude(), currentNode.Latitude(), currentNode.Longitude()) / walkSpeed
+				dist := utils.GetDistance(lastNode.Latitude(), lastNode.Longitude(), currentNode.Latitude(), currentNode.Longitude())
 				lastNode.AddDestination(currentNode, dist)
 				if isTwoWay {
 					currentNode.AddDestination(lastNode, dist)
