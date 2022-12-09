@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-
 	argsWithoutProg := os.Args[1:]
 
 	maxLat, _ := strconv.ParseFloat(argsWithoutProg[0], 32)
